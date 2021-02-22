@@ -1,13 +1,24 @@
 
 from django.db import models
 
+"""
+The basic models used by the application
+This automatically generates the relevant tables, completely removing any need for raw SQL
+Care should still be taken to ensure data cannot be accessed when not required
+"""
+
+
+# more granularity may be required with some addresses than others: this can be dealt with by code using the database
+class Addresses(models.Model):
+    addr = models.CharField(max_length=256)
+    postcode = models.CharField(max_length=8)
+    # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
+
 
 class People(models.Model):
     fname = models.CharField(max_length=32)
     lname = models.CharField(max_length=32)
-    addr = models.CharField(max_length=256)
-    postcode = models.CharField(max_length=8)
-    # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
+    location = models.ForeignKey(Addresses)
     phone_num = models.CharField(max_length=13)
     # allows for country code (e.g. +44)
 
@@ -20,8 +31,9 @@ class Test(models.Model):
 
 
 class Contact(models.Model):
-    positive_case = models.ForeignKey(People, on_delete=models.CASCADE)
+    positive_case = models.ForeignKey(Test, on_delete=models.CASCADE)
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
+    location = models.ForeignKey(Addresses)
 
 
 class TestContacted(models.Model):
