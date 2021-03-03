@@ -1,5 +1,6 @@
-from django.db import models
 
+from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
 
 """
 The basic models used by the application
@@ -13,6 +14,7 @@ class Addresses(models.Model):
     addr = models.CharField(max_length=256)
     postcode = models.CharField(max_length=8)
     # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
+    point = models.PointField(default=Point(0, 0))
 
 
 class People(models.Model):

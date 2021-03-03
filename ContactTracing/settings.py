@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'djgeojson',
+    'leaflet',
+    'django.contrib.gis'
 ]
 
 MIDDLEWARE = [
@@ -77,8 +81,12 @@ WSGI_APPLICATION = 'ContactTracing.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'PASSWORD': 'geraint',
+        'USER': 'geodjango',
+        'NAME': 'contacttracing',
+        'PORT': 5432,
+        'HOST': 'localhost'
     }
 }
 
