@@ -1,6 +1,5 @@
+from django.db import models
 
-from django.contrib.gis.db import models
-from django.contrib.gis.geos import Point
 
 """
 The basic models used by the application
@@ -14,7 +13,6 @@ class Addresses(models.Model):
     addr = models.CharField(max_length=256)
     postcode = models.CharField(max_length=8)
     # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
-    point = models.PointField(default=Point(0, 0))
 
 
 class People(models.Model):
@@ -33,8 +31,6 @@ class Test(models.Model):
     test_date = models.DateTimeField
     result = models.BooleanField
 
-    def point(self):
-        return self.person.location.point
 
 
 class Contact(models.Model):
@@ -42,9 +38,6 @@ class Contact(models.Model):
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
 
-    @property
-    def geom(self):
-        return self.location.point
 
 
 class TestContacted(models.Model):
