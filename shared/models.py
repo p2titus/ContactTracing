@@ -21,16 +21,15 @@ class People(models.Model):
     age = models.IntegerField
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     phone_num = models.CharField(max_length=13)
-    email = models.EmailField
+    email = models.EmailField()
     # allows for country code (e.g. +44)
 
 
 class Test(models.Model):
     person = models.ForeignKey(People, on_delete=models.CASCADE)
     # when you delete a person, all their tests are deleted from this table
-    test_date = models.DateTimeField
-    result = models.BooleanField
-
+    test_date = models.DateTimeField(auto_now_add=True)
+    result = models.BooleanField()
 
 
 class Contact(models.Model):
@@ -39,12 +38,11 @@ class Contact(models.Model):
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
 
 
-
 class TestContacted(models.Model):
     case = models.ForeignKey(Test, on_delete=models.CASCADE)
-    date_contacted = models.DateTimeField
+    date_contacted = models.DateTimeField(auto_now_add=True)
 
 
 class ContactContacted(models.Model):
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-    date_contacted = models.DateTimeField
+    date_contacted = models.DateTimeField(auto_now_add=True)
