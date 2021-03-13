@@ -8,18 +8,21 @@ from .models import *
 
 
 class ModelsTests(TestCase):
-    def setup(self):
+    def setUp(self):
         self.create_addresses()
         self.create_people()
 
     def create_people(self):
-        People.object.create(fname="Person", lname="A", addr=1, phone_num="A")
-        People.object.create(fname="Person", lname="B", addr=2, phone_num="B")
+        # TODO - are addresses done correctly?
+        addrA = Addresses.objects.get(addr="addrA")
+        addrB = Addresses.objects.get(addr="addrB")
+        People.objects.create(name="Person A", phone_num="A", email="A@example.com", location=addrA)
+        People.objects.create(name="Person B", phone_num="B", email="B@example.com", location=addrB)
 
     def create_addresses(self):
         Addresses.objects.create(addr="addrA", postcode="postcodeA")
         Addresses.objects.create(addr="addrB", postcode="postcodeB")
 
     def test_people_creation(self):
-        b = People.objects.get(lname="B")
+        b = People.objects.get(email="B@example.com")
         self.assertEqual(b.phone_num, "B")
