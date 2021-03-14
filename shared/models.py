@@ -23,6 +23,10 @@ class People(models.Model):
     email = models.EmailField()
     # allows for country code (e.g. +44)
 
+    def get_tests(self):
+        x = Test.object.get(person=self)
+        return x.order_by('-test_date')
+
 
 class Test(models.Model):
     person = models.ForeignKey(People, on_delete=models.CASCADE)
@@ -35,6 +39,12 @@ class Contact(models.Model):
     positive_case = models.ForeignKey(Test, on_delete=models.CASCADE)
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
+
+    def get_uncontacted(self):
+        x = Contact.objects.filter(
+            ~Exists(TestContacted.objects.get().case)
+        )
+        return x
 
 
 class TestContacted(models.Model):
