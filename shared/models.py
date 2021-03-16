@@ -19,7 +19,7 @@ class Addresses(models.Model):
 
 class People(models.Model):
     name = models.CharField(max_length=256)
-    age = models.IntegerField
+    age = models.IntegerField()
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     phone_num = models.CharField(max_length=13)
     email = models.EmailField()
