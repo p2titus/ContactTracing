@@ -4,24 +4,21 @@ from django.test import TestCase
 consequently, they are a fairly minimal set of tests. These are only designed to test correctness and adherence to the
 spec of the models
 these should pass by default. they may be moved to another folder later
-
-we instantiate with two people - persons A and B
-A has had a positive test case, and B has recently come into contact with A and thus must be tracked
-various expected retrievals of data from the database are carried out to ensure they work as expected"""
+"""
 
 from django.test import TestCase
 from .models import *
+from . import test_db_setup
 
 
 class ModelsTests(TestCase):
     _pos_case = None
     _contact = None
 
+    # details of the entities populating the database can be found in test_db_setup.py
     def setUp(self):
-        self.create_addresses()
-        (self._pos_case, self._contact) = self.create_people()
-        x = self.create_test_inst()
-        self.create_contact_inst(x)
+        setup = test_db_setup.DBSetup()
+        setup.setup()
 
     def test_people_creation(self):
         b = People.objects.get(email="B@example.com")

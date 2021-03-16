@@ -1,9 +1,24 @@
+"""
+we instantiate with two people - persons A and B
+A has had a positive test case, and B has recently come into contact with A and thus must be tracked
+various expected retrievals of data from the database are carried out to ensure they work as expected
+the variable namings of the contact makes it fairly clear which is which
+
+as this is to construct a test database, this is not done most efficiently - specifically, there will be more calls to
+the database than are requried
+"""
+
 from .models import *
 
 
 class DBSetup:
-    _pos_case = None
-    _contact = None
+    # have not been contacted yet
+    pos_case_non_contact = None
+    contact_non_contact = None
+
+    # have both been contacted once
+    pos_case_contact = None
+    contact_contact = None
 
     def setup(self):
         self.create_addresses()
@@ -11,19 +26,38 @@ class DBSetup:
         test = self.create_test_inst()
         self.create_contact_inst(test)
 
+    @staticmethod
+    def _gen_addr(id: str):
+        return Addresses.objects.create(addr="addr"+id, postcode="postcode"+id)
+
     def create_addresses(self):
-        Addresses.objects.create(addr="addrA", postcode="postcodeA")
-        Addresses.objects.create(addr="addrB", postcode="postcodeB")
+        self._gen_addr('A')
+        self._gen_addr('B')
+        self._gen_addr('C')
+        self._gen_addr('D')
+
+    @staticmethod
+    def _gen_person(id: str):
+        addr = Addresses.objects.get(addr="addr"+id)
+        return People.objects.create(name="Person "+id, phone_num=id, email=id+"@example.com", location=addr)
 
     def create_people(self):
-        addrA = Addresses.objects.get(addr="addrA")
-        addrB = Addresses.objects.get(addr="addrB")
-        a = People.objects.create(name="Person A", phone_num="A", email="A@example.com", location=addrA)
-        b = People.objects.create(name="Person B", phone_num="B", email="B@example.com", location=addrB)
-        return (a, b)
+        self.pos_case_non_contact = self._gen_person('A')
+        self.contact_non_contact = self._gen_person('B')
+        self.pos_case_contact = self._gen_person('C')
+        self.contact_contact = self._gen_person('D')
+
+    @staticmethod
+    def _gen_test(id: str):
+        case = People.objects.get(name="Person "+id)
+        return Test.objects.create(person=case, result=True)
 
     def create_test_inst(self):
-        return Test.objects.create(person=self._pos_case, result=True)
+        a = self._gen_test('A')
+        c = self._gen_test('C')
+        self.create_contact_inst(a)
+        self.create_contact_inst(c)
+
 
     def create_contact_inst(self, test):
         addr_b = Addresses.objects.get(addr="addrB")
