@@ -5,7 +5,7 @@ various expected retrievals of data from the database are carried out to ensure 
 the variable namings of the contact makes it fairly clear which is which
 
 as this is to construct a test database, this is not done most efficiently - specifically, there will be more calls to
-the database than are requried
+the database than are required
 """
 
 from .models import *
@@ -38,7 +38,7 @@ class DBSetup:
     @staticmethod
     def _gen_person(id: str):
         addr = Addresses.objects.get(addr="addr"+id)
-        return People.objects.create(name="Person "+id, phone_num=id, email=id+"@example.com", location=addr)
+        return People.objects.create(name="Person "+id, age=30, phone_num=id, email=id+"@example.com", location=addr)
 
     def create_people(self):
         self.pos_case_non_contact = self._gen_person('A')

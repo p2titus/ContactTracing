@@ -24,7 +24,9 @@ class ModelsTests(TestCase):
     # details of the entities populating the database can be found in test_db_setup.py
     def setUp(self):
         setup = test_db_setup.DBSetup()
+        print("start setup")
         setup.setup()
+        print("setup")
         self._pos_case_non_contact = setup.pos_case_non_contact
         self._contact_non_contact = setup.contact_non_contact
         self._pos_case_contact = setup.pos_case_contact
@@ -36,15 +38,15 @@ class ModelsTests(TestCase):
         self.assertEqual(b.phone_num, "B")
 
     # checks
-    def get_tests(self):
+    def test_get_tests(self):
         tests = Test.objects.get()
         self.assertEqual(tests.person, self._pos_case_non_contact)
 
-    def check_contacts(self):
+    def test_contacts(self):
         test = Test.objects.get(person=self._pos_case_non_contact)
         contact = Contact.object.get(positive_case=test)
         self.assertEqual(contact.case_contact, self._contact_non_contact)
 
-    def check_uncontacted(self):
+    def test_uncontacted(self):
         con = Contact.get_uncontacted()
         self.assertEqual(self._contact_non_contact, con)
