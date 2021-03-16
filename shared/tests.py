@@ -12,27 +12,39 @@ from . import test_db_setup
 
 
 class ModelsTests(TestCase):
-    _pos_case = None
-    _contact = None
+    # aliased for variables in setup
+    # haven't been contacted according to database
+    _pos_case_non_contact = None
+    _contact_non_contact = None
+
+    # have been contacted according to database
+    _pos_case_contact = None
+    _contact_contact = None
 
     # details of the entities populating the database can be found in test_db_setup.py
     def setUp(self):
         setup = test_db_setup.DBSetup()
         setup.setup()
+        self._pos_case_non_contact = setup.pos_case_non_contact
+        self._contact_non_contact = setup.contact_non_contact
+        self._pos_case_contact = setup.pos_case_contact
+        self._contact_contact = setup.contact_contact
 
+    # basic check on whether the database has been created successfully - non exhaustive
     def test_people_creation(self):
         b = People.objects.get(email="B@example.com")
         self.assertEqual(b.phone_num, "B")
 
+    # checks
     def get_tests(self):
         tests = Test.objects.get()
-        self.assertEqual(tests.person, self._pos_case)
+        self.assertEqual(tests.person, self._pos_case_non_contact)
 
     def check_contacts(self):
-        test = Test.objects.get(person=self._pos_case)
+        test = Test.objects.get(person=self._pos_case_non_contact)
         contact = Contact.object.get(positive_case=test)
-        self.assertEqual(contact.case_contact, self._contact)
+        self.assertEqual(contact.case_contact, self._contact_non_contact)
 
     def check_uncontacted(self):
         con = Contact.get_uncontacted()
-        self.assertEqual(self._contact, con)
+        self.assertEqual(self._contact_non_contact, con)

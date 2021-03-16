@@ -38,6 +38,7 @@ class Test(models.Model):
 class Contact(models.Model):
     positive_case = models.ForeignKey(Test, on_delete=models.CASCADE)
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
+    # this separate location is necessary for statistics - used to show where contact happened
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
 
     def get_uncontacted(self):
