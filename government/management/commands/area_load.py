@@ -3,8 +3,8 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.utils import LayerMapping
 from government.models import Area
 
-to_load = [("./government/areas/1countries/Countries_(December_2019)_Boundaries_UK_BGC.shp", Area.COUNTRY, "ctry19nm"),
-           ("./government/areas/2regions/Regions_(December_2019)_Boundaries_EN_BGC.shp", Area.REGION, "rgn19nm"),
+to_load = [("./government/areas/1countries/Countries_(December_2019)_Boundaries_UK_BUC.shp", Area.COUNTRY, "ctry19nm"),
+           ("./government/areas/2regions/Regions_(December_2019)_Boundaries_EN_BUC.shp", Area.REGION, "rgn19nm"),
            ("./government/areas/3counties/Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BGC.shp", Area.COUNTY, "ctyua19nm"),
            ("./government/areas/4local_authority_districts/Local_Authority_Districts_(December_2020)_UK_BGC.shp", Area.LA, "LAD20NM")]
 class CustomLayerMapping(LayerMapping):
