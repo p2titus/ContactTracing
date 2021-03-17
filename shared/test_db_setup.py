@@ -9,15 +9,19 @@ the database than are required
 """
 
 from .models import *
-
+import datetime
 
 class DBSetup:
     # have not been contacted yet
+    # A
     pos_case_non_contact = None
+    # B
     contact_non_contact = None
 
     # have both been contacted once
+    # C
     pos_case_contact = None
+    # D
     contact_contact = None
 
     def setup(self):
@@ -71,11 +75,11 @@ class DBSetup:
 
     @staticmethod
     def _gen_contacted_test(case):
-        return TestContacted.objects.create(case=case)
+        return TestContacted.objects.create(case=case, date_contacted=datetime.datetime.now())
 
     @staticmethod
     def _gen_contacted_contact(contact):
-        return ContactContacted(contact=contact)
+        return ContactContacted(contact=contact, date_contacted=datetime.datetime.now())
 
     def create_contacted_inst(self, pos_case, other):
         self._gen_contacted_test(pos_case)
