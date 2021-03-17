@@ -57,6 +57,7 @@ class ModelsTests(TestCase):
             count += 1
             if x == y:
                 return True, None
+            # convienient thing about python is that if a test fails, you can just call an identifying column on y
         return False, y
 
     def test_contacts(self):
@@ -65,14 +66,16 @@ class ModelsTests(TestCase):
         self.assertEqual(contact.case_contact, self._contact_non_contact)
 
     def test_contacts_not_empty(self):
-        con = Contact.objects.all()
+        con = ContactContacted.objects.all()
         cs = list(con)
+        ds = []
+        for c in cs:
+            ds.append(c.contact.case_contact)
         ex = [self._contact_contact]
-        self.__check_lists_equal(cs, ex)
+        self.__check_lists_equal(ds, ex)
 
     def test_uncontacted(self):
         con = Contact.get_uncontacted()
-        expected = [self._pos_case_non_contact]
-        print(con[0].case_contact.name)
-        print(con[1].case_contact.name)
+        expected = [self._pos_case_contact]
+        ds = []
         self.__check_lists_equal(con, expected)

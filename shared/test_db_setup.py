@@ -79,7 +79,7 @@ class DBSetup:
 
     @staticmethod
     def _gen_contacted_contact(contact):
-        return ContactContacted(contact=contact, date_contacted=datetime.datetime.now())
+        return ContactContacted.objects.create(contact=contact, date_contacted=datetime.datetime.now())
 
     def create_contacted_inst(self, pos_case, other):
         self._gen_contacted_test(pos_case)
