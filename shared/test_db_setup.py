@@ -24,6 +24,8 @@ class DBSetup:
         self.create_addresses()
         self.create_people()
         self.create_test_inst()
+        # creating the contacted instances
+        self.create_contacted_inst(self.pos_case_contact, self.contact_contact)
 
     @staticmethod
     def _gen_addr(id: str):
@@ -64,3 +66,15 @@ class DBSetup:
     # location on create_contact_inst only used for stats - use dummy value for testing
     def create_contact_inst(self, test, contact):
         return self._gen_contact(test, contact)
+
+    @staticmethod
+    def _gen_contacted_test(case):
+        return TestContacted.objects.create(case=case)
+
+    @staticmethod
+    def _gen_contacted_contact(contact):
+        return ContactContacted(case=contact)
+
+    def create_contacted_inst(self, pos_case, other):
+        self._gen_contacted_test(pos_case)
+        self._gen_contacted_contact(other)
