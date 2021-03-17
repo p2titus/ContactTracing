@@ -23,6 +23,7 @@ class People(models.Model):
     email = models.EmailField()
     # allows for country code (e.g. +44)
 
+    # gets all tests the current person has had that are on the system
     def get_tests(self):
         x = Test.object.get(person=self)
         return x.order_by('-test_date')
@@ -34,18 +35,30 @@ class Test(models.Model):
     test_date = models.DateTimeField(auto_now_add=True)
     result = models.BooleanField()
 
+    def get_contacts(self):
+        return Contact.objects.get(positive_case=self)
+
+    # returns all uncontacted test cases
+    @staticmethod
+    def get_uncontacted():
+        return Test.objects.filter(
+            ~Exists(TestContacted.objects.get().case)
+        )
+
 
 class Contact(models.Model):
     positive_case = models.ForeignKey(Test, on_delete=models.CASCADE)
+    # the person who came into contact with the person who tested positive
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
     # this separate location is necessary for statistics - used to show where contact happened
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
 
-    def get_uncontacted(self):
-        x = Contact.objects.filter(
-            ~Exists(TestContacted.objects.get().case)
+    # returns all uncontacted contacts
+    @staticmethod
+    def get_uncontacted():
+        return Contact.objects.filter(
+            ~Exists(ContactContacted.objects.get().case)
         )
-        return x
 
 
 class TestContacted(models.Model):
