@@ -41,9 +41,8 @@ class Test(models.Model):
     # returns all uncontacted test cases
     @staticmethod
     def get_uncontacted():
-        return Test.objects.filter(
-            ~Exists(TestContacted.objects.get().case)
-        )
+        xs = TestContacted.objects.all()
+        return Test.objects.exclude(person__in=xs.values_list('case', flat=True))
 
 
 class Contact(models.Model):
@@ -57,12 +56,6 @@ class Contact(models.Model):
     @staticmethod
     def get_uncontacted():
         xs = ContactContacted.objects.all()
-        """ys = list(xs)
-        zs = map(lambda y: y.case_contact.name, ys)
-        print("begin print in uncontacted")
-        for z in zs:
-            print(z)
-        print("end print in uncontacted")""" # all for testing
         return Contact.objects.exclude(case_contact__in=xs.values_list('contact', flat=True))
 
 

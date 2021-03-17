@@ -82,3 +82,12 @@ class ModelsTests(TestCase):
         for c in cs:
             ds.append(c)
         self.__check_lists_equal(con, ds)
+
+    def test_pos_case_uncontacted(self):
+        test = Test.get_uncontacted()
+        ts = list(test)
+        es = []
+        for t in ts:
+            es.append(t)
+        ex = [self._pos_case_non_contact]
+        self.__check_lists_equal(ex, es)
