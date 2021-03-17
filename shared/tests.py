@@ -38,10 +38,13 @@ class ModelsTests(TestCase):
     # checks
     def test_get_tests(self):
         tests = Test.objects.all()
+        ts = list(tests)
+        tests_person = list(map(lambda a: a.person, ts))
         expected = [self._pos_case_non_contact, self._pos_case_contact]
-        self.__check_lists_equal(tests, expected)
+        self.__check_lists_equal(tests_person, expected)
 
     # performs pairwise element check to see if two lists are equal
+    # TODO - error with repeated elements
     def __check_lists_equal(self, xs, ys):
         self.assertEqual(len(xs), len(ys))
         for x in xs:
@@ -49,7 +52,9 @@ class ModelsTests(TestCase):
 
     @staticmethod
     def __is_mem_of(y, xs):
+        count = 0
         for x in xs:
+            count += 1
             if x == y:
                 return True, None
         return False, y
