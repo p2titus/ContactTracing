@@ -25,7 +25,9 @@ class DBSetup:
         self.create_people()
         self.create_test_inst()
         # creating the contacted instances
-        self.create_contacted_inst(self.pos_case_contact, self.contact_contact)
+        pos_case = Test.objects.get(person=self.pos_case_contact)
+        cont = Contact.objects.get(positive_case=pos_case)
+        self.create_contacted_inst(pos_case, cont)
 
     @staticmethod
     def _gen_addr(id: str):
@@ -73,7 +75,7 @@ class DBSetup:
 
     @staticmethod
     def _gen_contacted_contact(contact):
-        return ContactContacted(case=contact)
+        return ContactContacted(contact=contact)
 
     def create_contacted_inst(self, pos_case, other):
         self._gen_contacted_test(pos_case)

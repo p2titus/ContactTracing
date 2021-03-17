@@ -24,9 +24,7 @@ class ModelsTests(TestCase):
     # details of the entities populating the database can be found in test_db_setup.py
     def setUp(self):
         setup = test_db_setup.DBSetup()
-        print("start setup")
         setup.setup()
-        print("setup")
         self._pos_case_non_contact = setup.pos_case_non_contact
         self._contact_non_contact = setup.contact_non_contact
         self._pos_case_contact = setup.pos_case_contact
