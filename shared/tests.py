@@ -76,6 +76,9 @@ class ModelsTests(TestCase):
 
     def test_uncontacted(self):
         con = Contact.get_uncontacted()
+        cs = list(con)
         expected = [self._pos_case_contact]
         ds = []
-        self.__check_lists_equal(con, expected)
+        for c in cs:
+            ds.append(c)
+        self.__check_lists_equal(con, ds)
