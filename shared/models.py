@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.db.models import Exists
 
 """
 The basic models used by the application
@@ -57,7 +57,7 @@ class Contact(models.Model):
     @staticmethod
     def get_uncontacted():
         return Contact.objects.filter(
-            ~Exists(ContactContacted.objects.get().case)
+            ~Exists(ContactContacted.objects.get().contact)
         )
 
 

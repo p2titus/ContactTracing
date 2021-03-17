@@ -37,12 +37,26 @@ class ModelsTests(TestCase):
 
     # checks
     def test_get_tests(self):
-        tests = Test.objects.get()
-        self.assertEqual(tests.person, self._pos_case_non_contact)
+        tests = Test.objects.all()
+        expected = [self._pos_case_non_contact, self._pos_case_contact]
+        self.__check_lists_equal(tests, expected)
+
+    # performs pairwise element check to see if two lists are equal
+    def __check_lists_equal(self, xs, ys):
+        self.assertEqual(len(xs), len(ys))
+        for x in xs:
+            self.assertEqual(self.__is_mem_of(x, ys), (True, None))
+
+    @staticmethod
+    def __is_mem_of(y, xs):
+        for x in xs:
+            if x == y:
+                return True, None
+        return False, y
 
     def test_contacts(self):
         test = Test.objects.get(person=self._pos_case_non_contact)
-        contact = Contact.object.get(positive_case=test)
+        contact = Contact.objects.get(positive_case=test)
         self.assertEqual(contact.case_contact, self._contact_non_contact)
 
     def test_uncontacted(self):
