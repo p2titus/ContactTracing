@@ -89,5 +89,6 @@ class ModelsTests(TestCase):
         es = []
         for t in ts:
             es.append(t)
-        ex = [self._pos_case_non_contact]
+        x = Test.objects.get(person=self._pos_case_non_contact)
+        ex = [x]
         self.__check_lists_equal(ex, es)

@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Exists
 
 """
 The basic models used by the application
@@ -38,11 +37,11 @@ class Test(models.Model):
     def get_contacts(self):
         return Contact.objects.get(positive_case=self)
 
-    # returns all uncontacted test cases
+    # returns all uncontacted Test objects
     @staticmethod
     def get_uncontacted():
         xs = TestContacted.objects.all()
-        return Test.objects.exclude(person__in=xs.values_list('case', flat=True))
+        return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
 
 
 class Contact(models.Model):
