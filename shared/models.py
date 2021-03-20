@@ -24,7 +24,7 @@ class People(models.Model):
 
     # gets all tests the current person has had that are on the system
     def get_tests(self):
-        x = Test.object.get(person=self)
+        x = Test.objects.get(person=self)
         return x.order_by('-test_date')
 
 
@@ -42,6 +42,20 @@ class Test(models.Model):
     def get_uncontacted():
         xs = TestContacted.objects.all()
         return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
+
+    def next_info(self):
+        try:
+            test = Test.objects.filter(result__exact=True).exclude(
+                person__in=TestContacted.objects.values_list('case', flat=True)
+            ).earliest('test_date')
+            try:
+                details = People.objects.first(id=test.person)
+            except People.DoesNotExist:
+                details = None
+        except Test.DoesNotExist:
+            test = None
+            details = None
+        return test, details
 
 
 class Contact(models.Model):
