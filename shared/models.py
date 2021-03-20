@@ -43,19 +43,14 @@ class Test(models.Model):
         xs = TestContacted.objects.all()
         return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
 
-    def next_info(self):
+    def get_next(self):
         try:
-            test = Test.objects.filter(result__exact=True).exclude(
+            test = Test.objects.exclude(
                 person__in=TestContacted.objects.values_list('case', flat=True)
-            ).earliest('test_date')
-            try:
-                details = People.objects.first(id=test.person)
-            except People.DoesNotExist:
-                details = None
+            ).filter(result__exact=True).earliest('test_date')
         except Test.DoesNotExist:
             test = None
-            details = None
-        return test, details
+        return test
 
 
 class Contact(models.Model):
