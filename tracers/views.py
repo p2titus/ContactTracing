@@ -19,4 +19,4 @@ def poscase(request):
             context = {'success': False, 'error': "Unable to retrieve case's details"}
     else:
         context = {'success': False, 'error': "No positive case available"}
-    return render(request, 'poscase.html', context)
+    return render(request, 'tracers/poscase.html', context)
