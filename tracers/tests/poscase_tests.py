@@ -15,11 +15,13 @@ def loadToyData(datalist):
         if contacted:
             TestContacted.objects.create(case=t)
 
+
 def toyExpectedNext(datalist):
+    # returns None if no uncontacted positive test found
     return next((x for x in datalist if x[1] and not x[2]), None)
 
 
-# testing the most basic functionality for poscase
+# testing the most basic functionality
 class PosCaseUncontactedTest(TestCase):
     datalist = [("Jane Doe", False, False),
                 ("John Doe", True, False),
