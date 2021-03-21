@@ -1,0 +1,88 @@
+{% load geojson_tags %}
+{% load leaflet_tags %}
+<html lang="en">
+<head>
+
+
+    <title>Contact tracing clusters</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+</head>
+<body>
+<h1>Contact Tracing clusters</h1>
+
+<div id="clusters-map" style="height: 80vh;"></div>
+
+
+<script>
+    const default_centre = [51, 0]
+    const default_zoom = 7
+
+    function style(feature) {
+        return {
+            fillColor: "red",
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+
+            fillOpacity: 0.7
+        };
+    }
+
+    function highlightFeature(e) {
+        let layer = e.target;
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+    }
+
+    const cluster_data = {{ clusters |geojsonfeature:"cluster_id,points_in_cluster:area"|safe }};
+
+    const map = L.map("clusters-map").setView(default_centre, default_zoom);
+
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1a1a471a-99d2-4dd3-80e0-9d1fc70cd64e', {
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+
+    let resetHighlight = (e) => {
+        json.resetStyle(e.target);
+    }
+
+    let zoomToFeature = (e) => {
+        map.fitBounds(e.target.getBounds());
+    }
+
+    let mapOnEachFeature = (feature, layer) => {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            //click: zoomToFeature
+        });
+        if (feature.properties) {
+            layer.bindPopup(`Cases in cluster: ${feature.properties.points_in_cluster}\nCluster id: ${feature.properties.cluster_id}`);
+        }
+    }
+    let json = L.geoJson(cluster_data, {
+        style: style,
+        onEachFeature: mapOnEachFeature
+    }).addTo(map);
+
+
+</script>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
-from government.models import Area
+from government.models import Area, Cluster
 from django.db import connection
 
 
@@ -47,3 +47,10 @@ group by ga.id;
 
     template = loader.get_template("government/index.html")
     return HttpResponse(template.render({"areas": data}, request))
+
+
+def clusters(request):
+    data = Cluster.objects.all()
+
+    template = loader.get_template("government/clusters.html")
+    return HttpResponse(template.render({"clusters": list(data)}, request))

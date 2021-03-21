@@ -20,4 +20,5 @@ from . import views
 urlpatterns = [
     # Homepage, such as it is:
     path('', views.index, name="index"),
+    path('clusters', views.clusters, name="clusters")
 ]

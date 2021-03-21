@@ -6,6 +6,7 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import PointOnSurface
 import random
 from datetime import date
+from government.hooks.dbscan import cluster
 
 UK_eastings_range = [3530514.28, 3570579.82]
 UK_northings_range = [3288094.49, 3219949.68]
@@ -56,6 +57,7 @@ class Command(BaseCommand):
         parser.add_argument('--fill_las_with_cases', action='store_true')
         parser.add_argument("--generate_random_cases", action="store_true")
         parser.add_argument("--generate_random_contacts", action="store_true")
+        parser.add_argument("--fix_missing_clusters", action="store_true")
 
     def handle(self, *args, **options):
         if options["fill_las_with_cases"]:
@@ -111,5 +113,14 @@ class Command(BaseCommand):
                 contacts[i].case_contact_id = people[i].id
             Contact.objects.bulk_create(contacts)
 
+        elif options["fix_missing_clusters"]:
+            print("Fixing missing clusters")
+            max_index = Contact.objects.all().order_by("-id")[0].id
+            for i in range(1, max_index):
+                c = Contact.objects.filter(id=i)
+                if c:
+                    cluster(c[0])
+                if i % 50 == 0:
+                    print(i)
         else:
             print("You need to provide an option.")
