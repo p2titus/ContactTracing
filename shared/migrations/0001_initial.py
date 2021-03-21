@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('addr', models.CharField(max_length=256)),
                 ('postcode', models.CharField(max_length=8)),
+                ('point', django.contrib.gis.db.models.fields.PointField(default=django.contrib.gis.geos.point.Point(0, 0), srid=3035)),
             ],
         ),
         migrations.CreateModel(

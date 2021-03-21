@@ -13,8 +13,9 @@ Care should still be taken to ensure data cannot be accessed when not required
 class Addresses(models.Model):
     addr = models.CharField(max_length=256)
     postcode = models.CharField(max_length=8)
-    # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
-    point = models.PointField(default=Point(0, 0))
+    # a map projection suitable for the UK, using metres as its units - so coordinates are actually Eastings and
+    # Northings: https://epsg.io/3035
+    point = models.PointField(default=Point(0, 0), srid=3035)
 
 
 class People(models.Model):

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=256)),
-                ('poly', django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326)),
+                ('poly', django.contrib.gis.db.models.fields.MultiPolygonField(srid=3035)),
                 ('type', models.CharField(choices=[('CTRY', 'Country'), ('REG', 'Region'), ('CNTY', 'County/Unitary Authority'), ('LA', 'Local Authority District')], default='LA', max_length=4)),
             ],
         ),
