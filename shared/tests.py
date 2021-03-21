@@ -4,56 +4,91 @@ from django.test import TestCase
 consequently, they are a fairly minimal set of tests. These are only designed to test correctness and adherence to the
 spec of the models
 these should pass by default. they may be moved to another folder later
-
-we instantiate with two people - persons A and B
-A has had a positive test case, and B has recently come into contact with A and thus must be tracked
-various expected retrievals of data from the database are carried out to ensure they work as expected"""
+"""
 
 from django.test import TestCase
 from .models import *
+from . import test_db_setup
 
 
 class ModelsTests(TestCase):
-    _pos_case = None
-    _contact = None
+    # aliased for variables in setup
+    # haven't been contacted according to database
+    _pos_case_non_contact = None
+    _contact_non_contact = None
 
+    # have been contacted according to database
+    _pos_case_contact = None
+    _contact_contact = None
+
+    # details of the entities populating the database can be found in test_db_setup.py
     def setUp(self):
-        self.create_addresses()
-        (self._pos_case, self._contact) = self.create_people()
-        x = self.create_test_inst()
-        self.create_contact_inst(x)
+        setup = test_db_setup.DBSetup()
+        setup.setup()
+        self._pos_case_non_contact = setup.pos_case_non_contact
+        self._contact_non_contact = setup.contact_non_contact
+        self._pos_case_contact = setup.pos_case_contact
+        self._contact_contact = setup.contact_contact
 
-    def create_addresses(self):
-        Addresses.objects.create(addr="addrA", postcode="postcodeA")
-        Addresses.objects.create(addr="addrB", postcode="postcodeB")
-
-    def create_people(self):
-        addrA = Addresses.objects.get(addr="addrA")
-        addrB = Addresses.objects.get(addr="addrB")
-        a = People.objects.create(name="Person A", phone_num="A", email="A@example.com", location=addrA)
-        b = People.objects.create(name="Person B", phone_num="B", email="B@example.com", location=addrB)
-        return (a, b)
-
-    def create_test_inst(self):
-        return Test.objects.create(person=self._pos_case, result=True)
-
-    def create_contact_inst(self, test):
-        addr_b = Addresses.objects.get(addr="addrB")
-        Contact.objects.create(case_contact=self._contact, positive_case=test, location=addr_b)
-
+    # basic check on whether the database has been created successfully - non exhaustive
     def test_people_creation(self):
         b = People.objects.get(email="B@example.com")
         self.assertEqual(b.phone_num, "B")
 
-    def get_tests(self):
-        tests = Test.objects.get()
-        self.assertEqual(tests.person, self._pos_case)
+    # checks
+    def test_get_tests(self):
+        tests = Test.objects.all()
+        ts = list(tests)
+        tests_person = list(map(lambda a: a.person, ts))
+        expected = [self._pos_case_non_contact, self._pos_case_contact]
+        self.__check_lists_equal(tests_person, expected)
 
-    def check_contacts(self):
-        test = Test.objects.get(person=self._pos_case)
-        contact = Contact.object.get(positive_case=test)
-        self.assertEqual(contact.case_contact, self._contact)
+    # performs pairwise element check to see if two lists are equal
+    def __check_lists_equal(self, xs, ys):
+        self.assertEqual(len(xs), len(ys))
+        for x in xs:
+            self.assertEqual(self.__is_mem_of(x, ys), (True, None))
+            ys.remove(x)
 
-    def check_uncontacted(self):
+    @staticmethod
+    def __is_mem_of(y, xs):
+        count = 0
+        for x in xs:
+            count += 1
+            if x == y:
+                return True, None
+            # convienient thing about python is that if a test fails, you can just call an identifying column on y
+        return False, y
+
+    def test_contacts(self):
+        test = Test.objects.get(person=self._pos_case_non_contact)
+        contact = Contact.objects.get(positive_case=test)
+        self.assertEqual(contact.case_contact, self._contact_non_contact)
+
+    def test_contacts_not_empty(self):
+        con = ContactContacted.objects.all()
+        cs = list(con)
+        ds = []
+        for c in cs:
+            ds.append(c.contact.case_contact)
+        ex = [self._contact_contact]
+        self.__check_lists_equal(ds, ex)
+
+    def test_uncontacted(self):
         con = Contact.get_uncontacted()
-        self.assertEqual(self._contact, con)
+        cs = list(con)
+        expected = [self._pos_case_contact]
+        ds = []
+        for c in cs:
+            ds.append(c)
+        self.__check_lists_equal(con, ds)
+
+    def test_pos_case_uncontacted(self):
+        test = Test.get_uncontacted()
+        ts = list(test)
+        es = []
+        for t in ts:
+            es.append(t)
+        x = Test.objects.get(person=self._pos_case_non_contact)
+        ex = [x]
+        self.__check_lists_equal(ex, es)

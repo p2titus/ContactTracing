@@ -1,4 +1,3 @@
-
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 
@@ -24,10 +23,12 @@ class People(models.Model):
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     phone_num = models.CharField(max_length=13)
     email = models.EmailField()
+
     # allows for country code (e.g. +44)
 
+    # gets all tests the current person has had that are on the system
     def get_tests(self):
-        x = Test.object.get(person=self)
+        x = Test.objects.get(person=self)
         return x.order_by('-test_date')
 
 
@@ -37,18 +38,29 @@ class Test(models.Model):
     test_date = models.DateTimeField(auto_now_add=True)
     result = models.BooleanField()
 
+    def get_contacts(self):
+        return Contact.objects.get(positive_case=self)
+
+    # returns all uncontacted Test objects
+    @staticmethod
+    def get_uncontacted():
+        xs = TestContacted.objects.all()
+        return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
+
 
 class Contact(models.Model):
     positive_case = models.ForeignKey(Test, on_delete=models.CASCADE)
+    # the person who came into contact with the person who tested positive
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
+    # this separate location is necessary for statistics - used to show where contact happened
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
     cluster = models.CharField(null=True, max_length=36, default=None)
 
-    def get_uncontacted(self):
-        x = Contact.objects.filter(
-            ~Exists(TestContacted.objects.get().case)
-        )
-        return x
+    # returns all uncontacted contacts
+    @staticmethod
+    def get_uncontacted():
+        xs = ContactContacted.objects.all()
+        return Contact.objects.exclude(case_contact__in=xs.values_list('contact', flat=True))
 
 
 class TestContacted(models.Model):
