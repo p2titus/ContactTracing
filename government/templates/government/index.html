@@ -36,11 +36,11 @@
         {% endfor %}
         </tbody>
     </table>
-    <div id="{{ var_name }}-map" style="height: 400px;"></div>
+    <div id="{{ var_name }}-map" style="height: 40vh;"></div>
 {% endfor %}
 
 <script>
-    const default_centre = [51,0]
+    const default_centre = [51, 0]
     const default_zoom = 7
 
     // from https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=8
@@ -63,7 +63,7 @@
     function style(feature) {
         return {
             fillColor: getColor(feature.properties.alltime_count),
-            weight: 2,
+            weight: 1,
             opacity: 1,
             color: 'white',
             dashArray: '3',
@@ -72,8 +72,7 @@
     }
 
     function highlightFeature(e) {
-        var layer = e.target;
-
+        let layer = e.target;
         layer.setStyle({
             weight: 5,
             color: '#666',
@@ -87,45 +86,42 @@
     }
 
     {% for _, var_name,data in areas %}
-        const {{ var_name }} = {{ data|geojsonfeature:"name,id,type,alltime_count:poly"|safe }}
-        {% if var_name == "las" %}
-            console.log("{{ var_name }}", {{ var_name }})
-        {%  endif %}
+        {
+            const geojson_data =
+                {{ data|geojsonfeature:"name,id,type,alltime_count:poly"|safe }};
 
 
-        var map = L.map("{{ var_name }}-map").setView(default_centre, default_zoom)
+            let map = L.map("{{ var_name }}-map").setView(default_centre, default_zoom)
 
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1a1a471a-99d2-4dd3-80e0-9d1fc70cd64e', {
-            maxZoom: 20,
-            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-        }).addTo(map);
-
-
+            L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1a1a471a-99d2-4dd3-80e0-9d1fc70cd64e', {
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+            }).addTo(map);
 
 
-        let {{ var_name }}_json = L.geoJson({{var_name}}, {
-            style: style,
-            onEachFeature: onEachFeature
-        }).addTo(map);
-
-        function resetHighlight(e) {
-            {{ var_name }}_json.resetStyle(e.target);
-        }
-        function zoomToFeature(e) {
-            map.fitBounds(e.target.getBounds());
-        }
-
-        function onEachFeature(feature, layer) {
-            layer.on({
-                mouseover: highlightFeature,
-                mouseout: resetHighlight,
-                click: zoomToFeature
-            });
-            if (feature.properties && feature.properties.popupContent) {
-                layer.bindPopup(feature.properties.alltime_count);
+            let resetHighlight = (e) => {
+                json.resetStyle(e.target);
             }
-        }
 
+            let zoomToFeature = (e) => {
+                map.fitBounds(e.target.getBounds());
+            }
+
+            let mapOnEachFeature = (feature, layer) => {
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight,
+                    //click: zoomToFeature
+                });
+                if (feature.properties && feature.properties.alltime_count) {
+                    layer.bindPopup(`Cases in entire pandemic: ${feature.properties.alltime_count}`);
+                }
+            }
+            let json = L.geoJson(geojson_data, {
+                style: style,
+                onEachFeature: mapOnEachFeature
+            }).addTo(map);
+        }
 
     {% endfor %}
 
