@@ -24,7 +24,7 @@ class People(models.Model):
 
     # gets all tests the current person has had that are on the system
     def get_tests(self):
-        x = Test.object.get(person=self)
+        x = Test.objects.get(person=self)
         return x.order_by('-test_date')
 
 
