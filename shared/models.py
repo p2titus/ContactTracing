@@ -11,6 +11,7 @@ Care should still be taken to ensure data cannot be accessed when not required
 # more granularity may be required with some addresses than others: this can be dealt with by code using the database
 class Addresses(models.Model):
     addr = models.CharField(max_length=256)
+    # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
     postcode = models.CharField(max_length=8)
     # a map projection suitable for the UK, using metres as its units - so coordinates are actually Eastings and
     # Northings: https://epsg.io/3035
@@ -21,14 +22,13 @@ class People(models.Model):
     name = models.CharField(max_length=256)
     age = models.IntegerField()
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
+    # allows for country code (e.g. +44)
     phone_num = models.CharField(max_length=13)
     email = models.EmailField()
 
-    # allows for country code (e.g. +44)
-
     # gets all tests the current person has had that are on the system
     def get_tests(self):
-        x = Test.objects.get(person=self)
+        x = Test.object.get(person=self)
         return x.order_by('-test_date')
 
 
