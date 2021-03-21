@@ -10,7 +10,7 @@ urlpatterns = [
     # ex: /testingCentre/CSV/
     path('CSV/', views.InputCSVView.as_view(), name='csv'),
     # ex: /testingCentre/singleTest/
-    path('singleTest/', views.InputSingleTest, name='singleTest'),
+    path('singleTest/', views.InputSingleTestView.as_view(), name='singleTest'),
     # /testingCentre/thanks/
     path('singleTest/thanks/', views.thanks, name='thanks'),
 
