@@ -1,5 +1,7 @@
-from django.db import models
+import datetime
 
+from django.db import models
+from django.utils import timezone
 
 """
 The basic models used by the application
@@ -17,13 +19,17 @@ class Addresses(models.Model):
 
 class People(models.Model):
     name = models.CharField(max_length=256)
-
+    # date_of_birth = models.DateField
+    # get rid of age here
     age = models.IntegerField
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     phone_num = models.CharField(max_length=13)
     email = models.EmailField
     # allows for country code (e.g. +44)
 
+    # def age(self):
+    #     now = timezone.now()
+    #     return int((now - self.date_of_birth).days / 365.25)
 
 class Test(models.Model):
     person = models.ForeignKey(People, on_delete=models.CASCADE)
