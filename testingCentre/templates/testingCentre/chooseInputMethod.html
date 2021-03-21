@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Choose Input Method</title>
+</head>
+<body>
+<form><button type="submit" formaction="{% url 'testingCentre:csv' %}">Input a CSV file</button></form>
+<form><button type="submit" formaction="{% url 'testingCentre:singleTest' %}">Input a single test</button></form>
+</body>
+</html>
