@@ -12,7 +12,7 @@ def poscase(request):
 
     if test is not None:
         context = {'success': True, 'date': test.test_date,
-                    'phone': test.person.phone_num, 'name': test.person.name}
+                   'phone': test.person.phone_num, 'name': test.person.name}
     else:
         context = {'success': False, 'error': "No positive case available"}
     return render(request, 'tracers/poscase.html', context)

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 """
 The basic models used by the application
@@ -33,6 +33,9 @@ class Test(models.Model):
     # when you delete a person, all their tests are deleted from this table
     test_date = models.DateTimeField(auto_now_add=True)
     result = models.BooleanField()
+    being_contacted = models.BooleanField(default=False)
+    # contact_start's value shouldn't need to be checked until after first update
+    contact_start = models.DateTimeField(auto_now_add=True)
 
     def get_contacts(self):
         return Contact.objects.get(positive_case=self)
@@ -43,11 +46,16 @@ class Test(models.Model):
         xs = TestContacted.objects.all()
         return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
 
+    # claims & returns earliest positive test that hasn't been claimed
+    # currently a claim doesn't time out
     def get_next(self):
         try:
-            test = Test.objects.exclude(
-                person__in=TestContacted.objects.values_list('case', flat=True)
-            ).filter(result__exact=True).earliest('test_date')
+            with transaction.atomic():
+                test = Test.objects.exclude(being_contacted__exact=True).exclude(
+                    person__in=TestContacted.objects.values_list('case', flat=True)
+                ).filter(result__exact=True).earliest('test_date')
+                test.being_contacted = True
+                test.save()
         except Test.DoesNotExist:
             test = None
         return test
@@ -59,6 +67,8 @@ class Contact(models.Model):
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
     # this separate location is necessary for statistics - used to show where contact happened
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
+    being_contacted = models.BooleanField(default=False)
+    contact_start = models.DateTimeField(auto_now_add=True)
 
     # returns all uncontacted contacts
     @staticmethod

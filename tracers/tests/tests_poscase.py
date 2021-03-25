@@ -46,5 +46,5 @@ class PosCaseContactedTest(TestCase):
     def test_no_next(self):
         self.assertEqual(Test().get_next(), toyExpectedNext(self.datalist))
 
-# change after adding new contacted entries needs to be tested
+# change after adding new contacted entries needs to be tested (jointly with input functionality)
 # concurrency stuff needs to be tested
