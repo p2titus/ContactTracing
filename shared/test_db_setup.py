@@ -45,8 +45,9 @@ class DBSetup:
 
     @staticmethod
     def _gen_person(id: str):
+        dob = datetime.date(1970, 1, 1)
         addr = Addresses.objects.get(addr="addr"+id)
-        return People.objects.create(name="Person "+id, age=30, phone_num=id, email=id+"@example.com", location=addr)
+        return People.objects.create(name="Person "+id, date_of_birth = dob, phone_num=id, email=id+"@example.com", location=addr)
 
     def create_people(self):
         self.pos_case_non_contact = self._gen_person('A')

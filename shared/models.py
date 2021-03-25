@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
+import datetime
 
 """
 The basic models used by the application
@@ -20,7 +21,7 @@ class Addresses(models.Model):
 
 class People(models.Model):
     name = models.CharField(max_length=256)
-    age = models.IntegerField()
+    date_of_birth = models.DateField(default=datetime.date(1970, 1, 1))  # default to unix epoch
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     # allows for country code (e.g. +44)
     phone_num = models.CharField(max_length=13)
