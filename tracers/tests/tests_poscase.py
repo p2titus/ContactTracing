@@ -4,6 +4,9 @@ from shared.models import *
 
 # create database entries from minimal data (preserving order)
 def loadToyData(xs):
+    #tests currently id people by name only - assert no duplicate names
+    assert len(xs) == len(set(map(lambda x: x[0], xs)))
+
     a = Addresses(addr="", postcode="")
     a.save()
     for psn, res, contacted in xs:
@@ -17,12 +20,18 @@ def loadToyData(xs):
 
 
 def toyExpectedNext(xs):
+    # removes & returns expected next element
     # returns None if no uncontacted positive test found
-    return next((x for x in xs if x[1] and not x[2]), None)
+    for i in range(len(xs)):
+        x = xs[i]
+        if x[1] and not x[2]:
+            del xs[i]
+            return x
+    return None
 
 
 # testing the most basic functionality
-class PosCaseUncontactedTest(TestCase):
+class GetUncontactedTest(TestCase):
     datalist = [("Jane Doe", False, False),
                 ("John Doe", True, False),
                 ("Joe Bloggs", True, False)]
@@ -35,7 +44,7 @@ class PosCaseUncontactedTest(TestCase):
                          toyExpectedNext(self.datalist)[0])
 
 
-class PosCaseContactedTest(TestCase):
+class DontGetContactedTest(TestCase):
     datalist = [("Jane Doe", False, False),
                 ("John Doe", False, True),
                 ("Joe Bloggs", True, True)]
@@ -46,5 +55,21 @@ class PosCaseContactedTest(TestCase):
     def test_no_next(self):
         self.assertEqual(Test().get_next(), toyExpectedNext(self.datalist))
 
-# change after adding new contacted entries needs to be tested (jointly with input functionality)
+class GetTestsInSequence(TestCase):
+    datalist = [("Jane Doe", True, False),
+                ("John Doe", True, False),
+                ("Joe Bloggs", True, False)]
+
+    def setUp(self):
+        loadToyData(self.datalist)
+
+    def test_next_is_earliest_pos(self):
+        for i in range(3):
+            self.assertEqual(Test().get_next().person.name,
+                             toyExpectedNext(self.datalist)[0])
+        #should 'run out'
+        self.assertEqual(Test().get_next(),
+                         toyExpectedNext(self.datalist))
+
+# change after adding new contacted entries needs to be tested
 # concurrency stuff needs to be tested

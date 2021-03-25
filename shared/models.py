@@ -47,8 +47,8 @@ class Test(models.Model):
         return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
 
     # claims & returns earliest positive test that hasn't been claimed
-    # currently a claim doesn't time out
-    def get_next(self):
+    @staticmethod
+    def get_next():
         try:
             with transaction.atomic():
                 test = Test.objects.exclude(being_contacted__exact=True).exclude(
