@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 """
 The basic models used by the application
@@ -16,7 +17,7 @@ class Addresses(models.Model):
 
 class People(models.Model):
     name = models.CharField(max_length=256)
-    age = models.IntegerField()
+    date_of_birth = models.DateField(default=datetime.date(1970, 1, 1))  # default to unix epoch
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     phone_num = models.CharField(max_length=13)
     email = models.EmailField()
