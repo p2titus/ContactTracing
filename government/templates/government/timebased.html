@@ -88,6 +88,7 @@
     </nav>
 </header>
 
+{% load govt_maths %}
 <!-- Begin page content -->
 <main class="flex-shrink-0">
     <div class="container" style="padding: 60px 15px 0">
@@ -100,10 +101,10 @@
                 <!-- TODO: make indicators real -->
                 <li><span class="number-highlight">{{ num_pos }}</span> positive cases
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
-                          title="{% if change_num_pos >= 0 %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}"
-                          class="badge {% if change_num_pos >= 0 %}bg-danger{% else %}bg-success{% endif %} align-text-top">
-                        {% if change_num_pos >= 0 %}▲{% else %}▼{% endif %}
-                        {{ change_num_pos }}
+                          title="{% if num_pos >= prev_num_pos %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_num_pos }} to {{ num_pos }}"
+                          class="badge {% if num_pos >= prev_num_pos %}bg-danger{% else %}bg-success{% endif %} align-text-top">
+                        {% if num_pos >= prev_num_pos %}▲{% else %}▼{% endif %}
+                        {{ num_pos|sub:prev_num_pos }}
                     </span>
                     <div style="width:75%;">
                         <canvas id="pos_case_canvas"></canvas>
@@ -111,10 +112,10 @@
                 </li>
                 <li><span class="number-highlight">{{ num_tests }}</span> tests performed
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
-                          title="{% if change_num_tests >= 0 %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }}"
-                          class="badge {% if change_num_tests >= 0 %}bg-success{% else %}bg-danger{% endif %} align-text-top">
-                        {% if change_num_tests >= 0 %}▲{% else %}▼{% endif %}
-                        {{ change_num_tests }}
+                          title="{% if num_tests >= prev_num_tests %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_num_tests }} to {{ num_tests }}"
+                          class="badge {% if num_tests >= prev_num_tests %}bg-success{% else %}bg-danger{% endif %} align-text-top">
+                        {% if num_tests >= prev_num_tests %}▲{% else %}▼{% endif %}
+                        {{ num_tests|sub:prev_num_tests }}
                     </span>
                     <div style="width:75%;">
                         <canvas id="num_tests_canvas"></canvas>
@@ -122,10 +123,10 @@
                 </li>
                 <li>a <span class="number-highlight">{{ pos_rate }}%</span> positivity rate
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
-                          title="{% if change_pos_rate >= 0 %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}"
-                          class="badge {% if change_pos_rate >= 0 %}bg-danger{% else %}bg-success{% endif %} align-text-top">
-                        {% if change_pos_rate >= 0 %}▲{% else %}▼{% endif %}
-                        {{ change_pos_rate }}%
+                          title="{% if pos_rate >= prev_pos_rate %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }} from {{ prev_pos_rate }} to {{ pos_rate }}"
+                          class="badge {% if pos_rate >= prev_pos_rate %}bg-danger{% else %}bg-success{% endif %} align-text-top">
+                        {% if pos_rate >= prev_pos_rate %}▲{% else %}▼{% endif %}
+                        {{ pos_rate|sub:prev_pos_rate }}%
                     </span>
                     <div style="width:75%;">
                         <canvas id="pos_rate_canvas"></canvas>

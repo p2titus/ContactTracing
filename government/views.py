@@ -46,9 +46,9 @@ def timebased(request, time_frame):
     num_pos = pos_tests.count()
 
     if num_tests == 0:
-        pos_rate = "NaN"
+        pos_rate = 100
     else:
-        pos_rate = num_pos / num_tests
+        pos_rate = 100 * num_pos / num_tests
 
     people_objects = People.objects.filter(test__test_date__gt=time_threshold)
     people_by_contacts = people_objects.annotate(Count('contact'))
@@ -62,12 +62,12 @@ def timebased(request, time_frame):
                       'max_contacts': max_contacts,
                       'avg_contacts': avg_contacts,
                       'pos_rate': pos_rate,
-                      # Change over previous time frame
-                      'change_num_tests': 1234,
-                      'change_num_pos': -1234,
-                      'change_max_contacts': -2,
-                      'change_avg_contacts': 1,
-                      'change_pos_rate': 1.45,
+                      # Data for previous time frame
+                      'prev_num_tests': 1234,
+                      'prev_num_pos': -1234,
+                      'prev_max_contacts': -2,
+                      'prev_avg_contacts': 1,
+                      'prev_pos_rate': 1.45,
                       # Time information
                       'time_frame': time_frame,
                       'time_description': get_time_description(time_frame),
