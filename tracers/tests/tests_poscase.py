@@ -10,7 +10,7 @@ def loadToyData(xs):
     a = Addresses(addr="", postcode="")
     a.save()
     for psn, res, contacted in xs:
-        p = People(name=psn, age=0, location=a,
+        p = People(name=psn, location=a,
                    phone_num="", email="hello@gmail.com")
         p.save()
         t = Test(person=p, result=res)
