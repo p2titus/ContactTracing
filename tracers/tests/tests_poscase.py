@@ -4,7 +4,7 @@ from shared.models import *
 
 # create database entries from minimal data (preserving order)
 def loadToyData(xs):
-    #tests currently id people by name only - assert no duplicate names
+    # tests currently differentiate people by name only - assert no duplicate names
     assert len(xs) == len(set(map(lambda x: x[0], xs)))
 
     a = Addresses(addr="", postcode="")
@@ -67,9 +67,10 @@ class GetTestsInSequence(TestCase):
         for i in range(3):
             self.assertEqual(Test().get_next().person.name,
                              toyExpectedNext(self.datalist)[0])
-        #should 'run out'
+        # should 'run out'
         self.assertEqual(Test().get_next(),
                          toyExpectedNext(self.datalist))
 
+#expiring claims needs to be tested
 # change after adding new contacted entries needs to be tested
 # concurrency stuff needs to be tested
