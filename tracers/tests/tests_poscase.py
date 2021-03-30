@@ -1,6 +1,6 @@
 from django.test import TestCase
 from shared.models import *
-
+from .. import views_help
 
 # create database entries from minimal data (preserving order)
 def loadToyData(xs):
@@ -40,7 +40,7 @@ class GetUncontactedTest(TestCase):
         loadToyData(self.datalist)
 
     def test_next_is_earliest_pos(self):
-        self.assertEqual(Test().get_next().person.name,
+        self.assertEqual(views_help.next_test().person.name,
                          toyExpectedNext(self.datalist)[0])
 
 
@@ -53,7 +53,7 @@ class DontGetContactedTest(TestCase):
         loadToyData(self.datalist)
 
     def test_no_next(self):
-        self.assertEqual(Test().get_next(), toyExpectedNext(self.datalist))
+        self.assertEqual(views_help.next_test(), toyExpectedNext(self.datalist))
 
 class GetTestsInSequence(TestCase):
     datalist = [("Jane Doe", True, False),
@@ -65,10 +65,10 @@ class GetTestsInSequence(TestCase):
 
     def test_next_is_earliest_pos(self):
         for i in range(3):
-            self.assertEqual(Test().get_next().person.name,
+            self.assertEqual(views_help.next_test().person.name,
                              toyExpectedNext(self.datalist)[0])
         # should 'run out'
-        self.assertEqual(Test().get_next(),
+        self.assertEqual(views_help.next_test(),
                          toyExpectedNext(self.datalist))
 
 #expiring claims needs to be tested
