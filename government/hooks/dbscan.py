@@ -1,3 +1,4 @@
+
 from shared.models import Contact
 from government.models import Cluster
 from django.contrib.gis.measure import D
