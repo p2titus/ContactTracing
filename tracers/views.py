@@ -7,6 +7,11 @@ def index(request):
     return HttpResponse("Hello, contact tracer!")
 
 
+def login(request):
+    return HttpResponse("default login response")
+    #return render(request, 'registration/login.html', {})
+
+
 def poscase(request):
     test = views_help.next_test()
     if test is not None:

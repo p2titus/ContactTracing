@@ -1,3 +1,5 @@
+from django.urls import include
+
 """ContactTracing URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -18,8 +20,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Homepage, such as it is:
-    path('', views.index, name="index"),
+    # default to login page iff not logged in
+    # TODO - redirect automatically if logged in already
+    path('', views.login, name='test'),  # include('django.contrib.auth.urls')),
 
     #temporary pages for displaying cases
     path('poscase/', views.poscase, name="poscase"),
