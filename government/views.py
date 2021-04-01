@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Count, Max, Min, Avg
 from shared.models import People, Test, TestContacted, ContactContacted, Contact
-from datetime import date, datetime, timedelta
-
+from datetime import date, time, datetime, timedelta
+from government.hooks.dbscan import MIN_PTS,EPS
 
 def index(request):
     return HttpResponse("Hello, Government user!.")
@@ -67,7 +67,11 @@ def get_time_statistics(time_frame,offset):
             age_data[i] -= age_data[i+1]
 
     max_contacts = people_by_contacts.aggregate(max=Max('contact__count'))['max']
+    if max_contacts is None:
+        max_contacts = 0
     avg_contacts = people_by_contacts.aggregate(average=Avg('contact__count'))['average']
+    if avg_contacts is None:
+        avg_contacts = 0
     return {'max': max_contacts, 'avg': avg_contacts, 'age_data': age_data, 'num' : num_tests, 'pos' : pos_tests, 'rate' : pos_rate }
 
 def timebased(request, time_frame):
@@ -84,12 +88,14 @@ def timebased(request, time_frame):
                       'max_contacts': sn['max'],
                       'avg_contacts': sn['avg'],
                       'pos_rate': sn['rate'],
+                      'cases_contacted': 78.45,
                       # Data for previous time frame
                       'prev_num_tests': sp['num'],
                       'prev_num_pos': sp['pos'],
                       'prev_max_contacts': sp['max'],
                       'prev_avg_contacts': sp['avg'],
                       'prev_pos_rate': sp['rate'],
+                      'prev_cases_contacted': 96.34,
                       # Time information
                       'time_frame': time_frame,
                       'time_description': get_time_description(time_frame),
@@ -98,5 +104,8 @@ def timebased(request, time_frame):
                       # Charting information
                       'charts_data': [(None, "Positive cases", "pos_case_canvas"),
                                       (None, "Tests performed", "num_tests_canvas"),
-                                      (None, "Positivity rate", "pos_rate_canvas")]
+                                      (None, "Positivity rate", "pos_rate_canvas")],
+                      # Clustering parameters
+                      'min_cases_in_cluster': MIN_PTS,
+                      'cluster_radius': EPS
                   })
