@@ -59,7 +59,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <ul class="navbar-nav mb-2 mb-md-0 d-flex" style="width: 100%;">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li>
@@ -77,12 +77,21 @@
                             <li><a class="dropdown-item" href="#">Custom time??</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown ms-auto">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Login
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">to the Laboratory system</a></li>
+                            <li><a class="dropdown-item" href="#">to the Tracing system</a></li>
+
+                        </ul>
+                    </li>
 
                 </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+
+
             </div>
         </div>
     </nav>
@@ -296,11 +305,12 @@
                           title="{% if cases_contacted >= prev_cases_contacted %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_cases_contacted }} to {{ cases_contacted }}"
                           class="badge {% if cases_contacted >= prev_cases_contacted %}bg-success{% else %}bg-danger{% endif %} align-text-top">
                         {% if cases_contacted >= prev_cases_contacted %}▲{% else %}▼{% endif %}
-                        {{cases_contacted|sub:prev_cases_contacted }}
+                        {{ cases_contacted|sub:prev_cases_contacted }}
                     </span>
 
                 </li>
-                <li><span class="number-highlight">{{ avg_contacts }}</span> was the average no. contacts per positive case
+                <li><span class="number-highlight">{{ avg_contacts }}</span> was the average no. contacts per positive
+                    case
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if avg_contacts >= prev_avg_contacts %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_avg_contacts }} to {{ avg_contacts }}"
                           class="badge {% if avg_contacts >= prev_avg_contacts %}bg-danger{% else %}bg-success{% endif %} align-text-top">
@@ -309,7 +319,8 @@
                     </span>
 
                 </li>
-                <li><span class="number-highlight">{{ max_contacts }}</span> was the largest number of contacts per positive case
+                <li><span class="number-highlight">{{ max_contacts }}</span> was the largest number of contacts per
+                    positive case
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if max_contacts >= prev_max_contacts %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_max_contacts }} to {{ max_contacts }}"
                           class="badge {% if max_contacts >= prev_max_contacts %}bg-danger{% else %}bg-success{% endif %} align-text-top">
@@ -320,9 +331,10 @@
                 </li>
 
             </ul>
-            <p>These contacts occurred in several clusters across the country, where a cluster is made up of at least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other.</p>
+            <p>These contacts occurred in several clusters across the country, where a cluster is made up of at
+                least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other.</p>
 
-           <div>Cluster map here</div>
+            <div>Cluster map here</div>
         </div>
 
     </div>
