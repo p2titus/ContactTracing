@@ -106,7 +106,7 @@
                         {% if num_pos >= prev_num_pos %}▲{% else %}▼{% endif %}
                         {{ num_pos|sub:prev_num_pos }}
                     </span>
-                    <div style="width:75%;">
+                    <div style="width:100%;">
                         <canvas id="pos_case_canvas"></canvas>
                     </div>
                 </li>
@@ -117,7 +117,7 @@
                         {% if num_tests >= prev_num_tests %}▲{% else %}▼{% endif %}
                         {{ num_tests|sub:prev_num_tests }}
                     </span>
-                    <div style="width:75%;">
+                    <div style="width:100%;">
                         <canvas id="num_tests_canvas"></canvas>
                     </div>
                 </li>
@@ -128,7 +128,7 @@
                         {% if pos_rate >= prev_pos_rate %}▲{% else %}▼{% endif %}
                         {{ pos_rate|sub:prev_pos_rate }}%
                     </span>
-                    <div style="width:75%;">
+                    <div style="width:100%;">
                         <canvas id="pos_rate_canvas"></canvas>
                     </div>
                 </li>
@@ -285,12 +285,46 @@
             </div>
         </div>
 
+        <div class="h-100 p-3 bg-light border rounded-3 mt-3 mb-3">
+            <h2>Contacts & Tracing</h2>
+            <p>In {{ time_description }}, </p>
+            <ul class="datapoints-list">
+                <!-- TODO: make indicators real -->
+                <li><span class="number-highlight">{{ cases_contacted }}%</span> of positive cases were contacted by
+                    tracers
+                    <span data-bs-toggle="tooltip" data-bs-placement="right"
+                          title="{% if cases_contacted >= prev_cases_contacted %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_cases_contacted }} to {{ cases_contacted }}"
+                          class="badge {% if cases_contacted >= prev_cases_contacted %}bg-success{% else %}bg-danger{% endif %} align-text-top">
+                        {% if cases_contacted >= prev_cases_contacted %}▲{% else %}▼{% endif %}
+                        {{cases_contacted|sub:prev_cases_contacted }}
+                    </span>
 
-        <p>
-            TODO: the same for contacts
-            Average # contacts -- {{ avg_contacts }}<br>
-            Highest # contacts -- {{ max_contacts }}
-        </p>
+                </li>
+                <li><span class="number-highlight">{{ avg_contacts }}</span> was the average no. contacts per positive case
+                    <span data-bs-toggle="tooltip" data-bs-placement="right"
+                          title="{% if avg_contacts >= prev_avg_contacts %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_avg_contacts }} to {{ avg_contacts }}"
+                          class="badge {% if avg_contacts >= prev_avg_contacts %}bg-danger{% else %}bg-success{% endif %} align-text-top">
+                        {% if avg_contacts >= prev_avg_contacts %}▲{% else %}▼{% endif %}
+                        {{ avg_contacts|sub:prev_avg_contacts }}
+                    </span>
+
+                </li>
+                <li><span class="number-highlight">{{ max_contacts }}</span> was the largest number of contacts per positive case
+                    <span data-bs-toggle="tooltip" data-bs-placement="right"
+                          title="{% if max_contacts >= prev_max_contacts %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_max_contacts }} to {{ max_contacts }}"
+                          class="badge {% if max_contacts >= prev_max_contacts %}bg-danger{% else %}bg-success{% endif %} align-text-top">
+                        {% if max_contacts >= prev_max_contacts %}▲{% else %}▼{% endif %}
+                        {{ max_contacts|sub:prev_max_contacts }}
+                    </span>
+
+                </li>
+
+            </ul>
+            <p>These contacts occurred in several clusters across the country, where a cluster is made up of at least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other.</p>
+
+           <div>Cluster map here</div>
+        </div>
+
     </div>
 </main>
 
