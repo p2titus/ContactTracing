@@ -42,6 +42,7 @@ def get_time_statistics(time_frame,offset):
     time_threshold_0 = date.today() - timedelta(days=time_frame*(offset+1))
     time_threshold_1 = date.today() - timedelta(days=offset*time_frame)
     test_objects = Test.objects.filter(test_date__gt=time_threshold_0).filter(test_date__lte=time_threshold_1)
+
     num_tests = test_objects.count()
     pos_tests = test_objects.filter(result=True)
     num_pos = pos_tests.count()
@@ -69,10 +70,15 @@ def get_time_statistics(time_frame,offset):
     max_contacts = people_by_contacts.aggregate(max=Max('contact__count'))['max']
     if max_contacts is None:
         max_contacts = 0
+
     avg_contacts = people_by_contacts.aggregate(average=Avg('contact__count'))['average']
     if avg_contacts is None:
         avg_contacts = 0
-    return {'max': max_contacts, 'avg': avg_contacts, 'age_data': age_data, 'num' : num_tests, 'pos' : pos_tests, 'rate' : pos_rate }
+
+    contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(date_contacted__lte=time_threshold_1).count()
+
+    return {'max': max_contacts, 'avg': avg_contacts, 'age_data': age_data, 'num' : num_tests, 'pos' : pos_tests, 'rate' : pos_rate, 'contacted' : contacted }
+
 
 def timebased(request, time_frame):
 
@@ -88,14 +94,14 @@ def timebased(request, time_frame):
                       'max_contacts': sn['max'],
                       'avg_contacts': sn['avg'],
                       'pos_rate': sn['rate'],
-                      'cases_contacted': 78.45,
+                      'cases_contacted': sn['contacted'],
                       # Data for previous time frame
                       'prev_num_tests': sp['num'],
                       'prev_num_pos': sp['pos'],
                       'prev_max_contacts': sp['max'],
                       'prev_avg_contacts': sp['avg'],
                       'prev_pos_rate': sp['rate'],
-                      'prev_cases_contacted': 96.34,
+                      'prev_cases_contacted': sp['contacted'],
                       # Time information
                       'time_frame': time_frame,
                       'time_description': get_time_description(time_frame),
