@@ -9,22 +9,22 @@ from datetime import date, time, datetime, timedelta
 from government.hooks.dbscan import MIN_PTS,EPS
 
 def index(request):
-    # Mimicking, but with tests instead of addresses
-    # select ga.*, count(a) from government_area as ga
-    #   join shared_addresses as a on st_intersects(ga.poly, a.point)
-    #   group by ga.id
+    return "Hello!"
+
+
+def get_geographic_data(start_day):
 
     # Should be fine to use raw SQL as we aren't using user input
     geos_point_type = connection.ops.select % "poly"  # poly is the name of the field in Area
     areas_with_alltime_counts = Area.objects.raw("""
-        select ga.id, ga.%s as poly, ga.type, ga.name, count(test) as alltime_count
+        select ga.id, ga.poly::bytea as poly, ga.type, ga.name, count(test) as alltime_count
             from shared_test as test
                 join shared_people sp on test.person_id = sp.id
                 join shared_addresses sa on sa.id = sp.location_id
                 join government_area ga on st_intersects(sa.point, ga.poly)
-            where test.result = True
+            where test.result = True and test.test_date>= %s
 group by ga.id;
-    """ % geos_point_type)
+    """, [  start_day])
 
     countries = []
     regions = []
@@ -43,14 +43,13 @@ group by ga.id;
     # TODO: need to add timestamps to database
 
     data = [
-        ("Nation", "nations", countries),
-        ("Region (England only)", "regions", regions),
-        ("County/Unitary Authority", "counties", counties),
-        ("Local Authority District", "las", las)
+        ("Nation", "country", countries),
+        ("Region (England only)", "region", regions),
+        ("County/Unitary Authority", "county", counties),
+        ("Local Authority District", "la", las)
     ]
 
-    template = loader.get_template("government/index.html")
-    return HttpResponse(template.render({"areas": data}, request))
+    return data
 
 
 def clusters(request):
@@ -136,5 +135,10 @@ def timebased(request, time_frame):
                                       (None, "Positivity rate", "pos_rate_canvas")],
                       # Clustering parameters
                       'min_cases_in_cluster': MIN_PTS,
-                      'cluster_radius': EPS
+                      'cluster_radius': EPS,
+                      # clustering data
+                      "clusters": list(Cluster.objects.all()),
+                      # geographic areas data
+                      "areas": get_geographic_data(time_threshold)
+
                   })
