@@ -30,28 +30,32 @@ class SingleTestForm(forms.Form):
             possibleAddress = Addresses.objects.filter(addr__exact=self.cleaned_data['addr'],
                                                        postcode=self.cleaned_data['postcode'])
             if possibleAddress.count() == 0:
+                location = Addresses(addr=self.cleaned_data['addr'], postcode=self.cleaned_data['postcode'])
+                location.save()
                 p = People(
                     name=self.cleaned_data['name'],
                     phone_num=self.cleaned_data['phone_num'],
+                    date_of_birth=self.cleaned_data['date_of_birth'],
                     email=self.cleaned_data['email'],
-                    location=Addresses(addr=self.cleaned_data['address'], postcode=self.cleaned_data['postcode'])
+                    location=Addresses.objects.get(pk=location)
                 )
             else:
                 p = People(
                     name=self.cleaned_data['name'],
                     phone_num=self.cleaned_data['phone_num'],
+                    date_of_birth=self.cleaned_data['date_of_birth'],
                     email=self.cleaned_data['email'],
-                    location=possibleAddress.first.pk
+                    location=possibleAddress.first()
                 )
             p.save()
             return p.pk
         else:
-            return person.first.pk
+            return person.first().pk
 
     # assumes that the test has not already been input
     def input_test(self, personID):
         t = Test(
-            person=personID,
+            person=People(pk=personID),
             test_date=self.cleaned_data['test_date'],
             result=self.cleaned_data['result']
         )
