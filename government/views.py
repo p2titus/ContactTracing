@@ -59,13 +59,15 @@ def get_time_statistics(time_frame,offset):
     for i in range (0,90,10):
         birthday = date.today() - timedelta(days=i*365)
         age_groups.append(birthday)
+    #by this point, age_groups is a list of the dates today, 10 years ago... up to 80 years ago
 
-    age_data = []
-    for i in range(8,-1,-1):
+    age_test_data = []
+    for i in range(0,9,1):
         birthday = age_groups[i]
-        age_data.append(people_objects.filter(date_of_birth__gte=birthday).count())
-        if i<8:
-            age_data[i] -= age_data[i+1]
+        age_test_data.append(people_objects.filter(date_of_birth__gte=birthday).count())
+    for i in range(0,8,1):
+        age_test_data[i] -= age_test_data[i+1]
+    #age_data is now a list of size 9 with the number of people in the ages 0-9,10-19.. 80+ who have been tested
 
     max_contacts = people_by_contacts.aggregate(max=Max('contact__count'))['max']
     if max_contacts is None:
@@ -77,7 +79,7 @@ def get_time_statistics(time_frame,offset):
 
     contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(date_contacted__lte=time_threshold_1).count()
 
-    return {'max': max_contacts, 'avg': avg_contacts, 'age_data': age_data, 'num' : num_tests, 'pos' : pos_tests, 'rate' : pos_rate, 'contacted' : contacted }
+    return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'num': num_tests, 'pos': pos_tests, 'rate': pos_rate, 'contacted': contacted }
 
 
 def timebased(request, time_frame):
