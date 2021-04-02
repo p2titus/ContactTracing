@@ -23,5 +23,6 @@ urlpatterns = [
 
     #temporary pages for displaying cases
     path('poscase/', views.poscase, name="poscase"),
+    path('add_contact/', views.add_contact, name='contact'),
 
 ]

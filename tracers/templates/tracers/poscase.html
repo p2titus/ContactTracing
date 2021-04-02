@@ -5,6 +5,12 @@
     {{name}}
     {{phone}}
     {{date}}
+    <form action="/tracers/add_contact/", method="post">
+    {% csrf_token %}
+    <input type="hidden" id="case_id" value= {{ id }}>
+    <input type="hidden" id="case_name" value = {{ name }}>
+    <input type="submit" value="Add Contact">
+    </form>
 {% else %}
     {{error}}
 {% endif %}
