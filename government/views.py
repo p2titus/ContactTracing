@@ -54,6 +54,7 @@ def get_time_statistics(time_frame,offset):
 
     people_objects = People.objects.filter(test__test_date__gt=time_threshold_0).filter(test__test_date__lte=time_threshold_1)
     people_by_contacts = people_objects.annotate(Count('contact'))
+    pos_people = People.objects.filter(test__result=True)
 
     age_groups = []
     for i in range (0,90,10):
@@ -69,6 +70,13 @@ def get_time_statistics(time_frame,offset):
         age_test_data[i] -= age_test_data[i+1]
     #age_data is now a list of size 9 with the number of people in the ages 0-9,10-19.. 80+ who have been tested
 
+    age_pos_data = []
+    for i in range(0,9,1):
+        birthday = age_groups[i]
+        age_pos_data.append(pos_people.filter(date_of_birth__gte=birthday).count())
+    for i in range(0,8,1):
+        age_pos_data[i] -= age_pos_data[i+1]
+    #age_pos_data is now a list of size 9 with the number of positive cases for people in each age group
     max_contacts = people_by_contacts.aggregate(max=Max('contact__count'))['max']
     if max_contacts is None:
         max_contacts = 0
@@ -79,7 +87,7 @@ def get_time_statistics(time_frame,offset):
 
     contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(date_contacted__lte=time_threshold_1).count()
 
-    return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'num': num_tests, 'pos': pos_tests, 'rate': pos_rate, 'contacted': contacted }
+    return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'age_pos_data': age_pos_data, 'num': num_tests, 'pos': pos_tests, 'rate': pos_rate, 'contacted': contacted}
 
 
 def timebased(request, time_frame):
@@ -97,6 +105,8 @@ def timebased(request, time_frame):
                       'avg_contacts': sn['avg'],
                       'pos_rate': sn['rate'],
                       'cases_contacted': sn['contacted'],
+                      'age_test_data': sn['age_test_data'],
+                      'age_pos_data': sn['age_pos_data'],
                       # Data for previous time frame
                       'prev_num_tests': sp['num'],
                       'prev_num_pos': sp['pos'],
@@ -104,6 +114,8 @@ def timebased(request, time_frame):
                       'prev_avg_contacts': sp['avg'],
                       'prev_pos_rate': sp['rate'],
                       'prev_cases_contacted': sp['contacted'],
+                      'prev_age_test_data': sp['age_test_data'],
+                      'prev_age_pos_data': sp['age_pos_data'],
                       # Time information
                       'time_frame': time_frame,
                       'time_description': get_time_description(time_frame),
