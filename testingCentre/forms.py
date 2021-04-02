@@ -1,16 +1,18 @@
 from django import forms
 from shared.models import People, Addresses, Test
+import datetime
 
 class SingleTestForm(forms.Form):
+    year = datetime.datetime.today().year
+    # will run into problems if people start living more than 150 years
+    years = list(range(year, year-150, -1))
     name = forms.CharField(label='Name', max_length=256)
-    # date_of_birth = forms.DateField(label='Date of Birth')
-    # get rid of age here
-    date_of_birth = forms.IntegerField(label='Date of Birth', widget=forms.SelectDateWidget)
+    date_of_birth = forms.DateField(label='Date of Birth', widget=forms.SelectDateWidget(years=years))
     phone_num = forms.CharField(label='Phone number', max_length=13)
     email = forms.EmailField(label='Email')
     addr = forms.CharField(label='Address', max_length=256)
     postcode = forms.CharField(label='Postcode', max_length=8)
-    test_date = forms.DateTimeField(label='Date of Test', widget=forms.SelectDateWidget)
+    test_date = forms.DateTimeField(label='Date of Test', widget=forms.SelectDateWidget(years=years))
     result = forms.BooleanField(label='Positive test?', required=False)
 
     # find if a person already exists in the database. Enter them if not and return the pk.
