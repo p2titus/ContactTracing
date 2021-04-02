@@ -1,15 +1,14 @@
 {%load static%}
 <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
 
-<p><form action="/tracers/poscase" type="POST">
-    <input type="submit" value="New Case" />
+<p><form action="/tracers/contact" type="POST">
+    <input type="submit" value="New Contact" />
 </form></p>
 
 {% if success %}
-    <p>Person who has tested positive</p>
+    <p>Person who has come into contact with someone who tested positive</p>
     <p>NAME: {{name}}</p>
     <p>PHONE: {{phone}}</p>
-    <p>DATE: {{date}}</p>
 {% else %}
     {{error}}
 {% endif %}
