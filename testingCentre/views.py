@@ -17,12 +17,17 @@ class InputCSVView(generic.TemplateView):
 def thanks(request):
     return HttpResponse("Result Entered")
 
+def add_person(request):
+    if request.method == 'POST':
+        form = SingleTestForm(request.POST)
+        if form.is_valid():
+            form.add_person()
+            return HttpResponseRedirect('singleTest/thanks/')
+    else:
+        return HttpResponseRedirect('singleTest/')
 
 class InputSingleTestView(generic.FormView):
     template_name = 'testingCentre/singleTest.html'
     form_class = SingleTestForm
     success_url = '/thanks/'
 
-    def form_valid(self, form):
-        form.add_person()
-        return super.form_valid(form)

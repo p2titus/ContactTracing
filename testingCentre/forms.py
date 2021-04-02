@@ -20,16 +20,16 @@ class SingleTestForm(forms.Form):
         person = People.objects.filter(name__exact=self.cleaned_data['name'],
                                        phone_num__exact=self.cleaned_data['phone_num'],
                                        email__exact=self.cleaned_data['email'],
-                                       age__exact=self.cleaned_data['date_of_birth'],
-                                       location__addr__exact=self.cleaned_data['address'],
+                                       date_of_birth__exact=self.cleaned_data['date_of_birth'],
+                                       location__addr__exact=self.cleaned_data['addr'],
                                        location__postcode__exact=self.cleaned_data['postcode'])
-        assert (person.count <= 1)
-        if person.count == 0:
+        assert (person.count() <= 1)
+        if person.count() == 0:
             # add person to model
             # check if address exists
-            possibleAddress = Addresses.objects.filter(addr__exact=self.cleaned_data['address'],
+            possibleAddress = Addresses.objects.filter(addr__exact=self.cleaned_data['addr'],
                                                        postcode=self.cleaned_data['postcode'])
-            if possibleAddress.count == 0:
+            if possibleAddress.count() == 0:
                 p = People(
                     name=self.cleaned_data['name'],
                     phone_num=self.cleaned_data['phone_num'],

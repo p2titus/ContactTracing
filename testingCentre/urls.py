@@ -13,6 +13,8 @@ urlpatterns = [
     path('singleTest/', views.InputSingleTestView.as_view(), name='singleTest'),
     # /testingCentre/thanks/
     path('singleTest/thanks/', views.thanks, name='thanks'),
+    # /testingCentre/singleTest/addPerson
+    path('singleTest/addPerson/', views.add_person, name='add person'),
 
     # path('singleTest/enterResult/', views.thanks, name='thanks'),
 
