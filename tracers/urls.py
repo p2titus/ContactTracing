@@ -20,11 +20,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # default to login page iff not logged in
-    # TODO - redirect automatically if logged in already
-    path('', views.login, name='test'),  # include('django.contrib.auth.urls')),
 
-    #temporary pages for displaying cases
+    # redirects to login view - this should handle business logic of whether user is already logged in or not
+    path('', views.login),
+
+    # everything related to authentication is hidden under the accounts sub-directory
+    path('accounts/', include('django.contrib.auth.urls')),
+
+    # temporary pages for displaying cases
     path('poscase/', views.poscase, name="poscase"),
 
 ]

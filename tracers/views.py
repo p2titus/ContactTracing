@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . import views_help
 
 
@@ -7,9 +7,9 @@ def index(request):
     return HttpResponse("Hello, contact tracer!")
 
 
+# TODO - redirect to home page if logged in already
 def login(request):
-    return HttpResponse("default login response")
-    #return render(request, 'registration/login.html', {})
+    return redirect('accounts/login')
 
 
 def poscase(request):
