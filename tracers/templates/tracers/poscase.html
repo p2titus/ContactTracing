@@ -1,0 +1,10 @@
+{%load static%}
+<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+{% if success %}
+    <p>Person who has tested positive</p>
+    {{name}}
+    {{phone}}
+    {{date}}
+{% else %}
+    {{error}}
+{% endif %}
