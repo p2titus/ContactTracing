@@ -1,9 +1,13 @@
 from django import forms
-from shared.models import People, Addresses, Contact
+from shared.models import People, Addresses, Contact, Test
+
+class Form(forms.Form):
+    case_id = forms.IntegerField(widget=forms.HiddenInput)
+    case_name = forms.CharField(widget=forms.HiddenInput)
 
 class ContactForm(forms.Form):
-    case_id = forms.IntegerField(label='caseID', disabled=True)
-    case_name = forms.CharField(label='Case Name', disabled=True)
+    case_id = forms.IntegerField(label='Case ID', widget=forms.HiddenInput)
+    case_name = forms.CharField(label='Case Name', widget=forms.HiddenInput)
     contact_name = forms.CharField(label='Contact Name', max_length=256)
     contact_phone_num = forms.CharField(label='Contact Phone number', max_length=13)
     contact_email = forms.EmailField(label='Contact Email')
@@ -30,14 +34,13 @@ class ContactForm(forms.Form):
                     name=self.cleaned_data['contact_name'],
                     phone_num=self.cleaned_data['contact_phone_num'],
                     email=self.cleaned_data['contact_email'],
-                    location=Addresses.objects.get(pk=location)
+                    location=Addresses.objects.get(pk=location.pk)
                 )
             else:
                 p = People(
-                    name=self.cleaned_data['name'],
-                    phone_num=self.cleaned_data['phone_num'],
-                    date_of_birth=self.cleaned_data['date_of_birth'],
-                    email=self.cleaned_data['email'],
+                    name=self.cleaned_data['contact_name'],
+                    phone_num=self.cleaned_data['contact_phone_num'],
+                    email=self.cleaned_data['contact_email'],
                     location=possibleAddress.first()
                 )
             p.save()
@@ -48,8 +51,7 @@ class ContactForm(forms.Form):
     # find if an address already exists in the database. Enter it if not and return the pk.
     def lookup_address(self):
         address = Addresses.objects.filter(addr__exact=self.cleaned_data['place_of_contact'],
-                                       phone_num__exact=self.cleaned_data['contact_phone_num'],
-                                       email__exact=self.cleaned_data['contact_email'])
+                                       postcode__exact=self.cleaned_data['postcode'])
         assert (address.count() <= 1)
         if address.count() == 0:
             location = Addresses(addr=self.cleaned_data['place_of_contact'], postcode=self.cleaned_data['postcode'])
@@ -62,7 +64,7 @@ class ContactForm(forms.Form):
     # assumes that the test has not already been input
     def input_contact(self, contactID, location):
         t = Contact(
-            positive_case = People.objects.get(pk=self.cleaned_data['case_id']),
+            positive_case = Test.objects.get(pk=self.cleaned_data['case_id']),
             case_contact = People.objects.get(pk=contactID),
             location = Addresses.objects.get(pk=location)
         )
@@ -72,4 +74,4 @@ class ContactForm(forms.Form):
         # process the data in self.cleaned_data as required
         person = self.lookup_person()
         location = self.lookup_address()
-        self.input_test(person, location)
+        self.input_contact(person, location)
