@@ -31,6 +31,11 @@ def next_test():
     return test
 
 
+# note that a person is filtered out after being contacted
+# by a tracer just once.
+# over a longer time period, a person would need to be
+# contacted twice if entered twice
+# TODO: add this feature or decide not to add it
 def contacts_needing_contacting():
     return Contact.objects.exclude(unexpired_claim) \
         .exclude(person__in=ContactContacted.objects.values_list('case', flat=True))

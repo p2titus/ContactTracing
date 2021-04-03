@@ -1,5 +1,5 @@
 from django import forms
-from shared.models import People, Addresses, Contact, Test
+from shared.models import *
 
 class Form(forms.Form):
     case_id = forms.IntegerField(widget=forms.HiddenInput)
@@ -28,7 +28,7 @@ class ContactForm(forms.Form):
             if possibleAddress.count() == 0:
                 location = Addresses(addr=self.cleaned_data['place_of_contact'], postcode=self.cleaned_data['postcode'])
                 location.save()
-                #bit weird because persons address gets saved as the place of contact, which is not necessarily accurate, also their date of birth will be the default
+                # bit weird because persons address gets saved as the place of contact, which is not necessarily accurate, also their date of birth will be the default
                 # TODO: Check this doesn't effect the stats
                 p = People(
                     name=self.cleaned_data['contact_name'],
@@ -70,8 +70,37 @@ class ContactForm(forms.Form):
         )
         t.save()
 
+
     def add_contact(self):
         # process the data in self.cleaned_data as required
         person = self.lookup_person()
         location = self.lookup_address()
         self.input_contact(person, location)
+
+
+# a form for updating TestContacted if successful
+class TestContactedForm(forms.Form):
+    case_id = forms.IntegerField(label='Case ID', widget=forms.HiddenInput)
+    success = forms.BooleanField(label='Successfully contacted')
+
+    def confirm_call(self):
+        if self.cleaned_data['success']:
+            case = Test.objects.get(pk=self.cleaned_data['case_id'])
+            c = TestContacted(
+                case=case
+            )
+            c.save()
+
+
+# a form for updating ContactContacted if successful
+class ContactContactedForm(forms.Form):
+    contact_id = forms.IntegerField(label='Contact ID', widget=forms.HiddenInput)
+    success = forms.BooleanField(label='Successfully contacted')
+
+    def confirm_call(self):
+        if self.cleaned_data['success']:
+            contact = Contact.objects.get(pk=self.cleaned_data['case_id'])
+            c = ContactContacted(
+                contact=contact
+            )
+            c.save()

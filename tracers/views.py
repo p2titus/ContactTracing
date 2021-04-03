@@ -9,7 +9,7 @@ from .forms import ContactForm, Form
 def index(request):
     return HttpResponse("Hello, contact tracer!")
 
-
+# TODO: warning before leaving page (here & for contact)
 def poscase(request):
     """test = views_help.next_test()
     if test is not None:
@@ -31,6 +31,8 @@ def contact(request):
         context = {'success': False, 'error': "No positive case available"}"""
     context = {'success': False, 'error': "Page incomplete..."}
     return render(request, 'tracers/contact.html', context)
+
+# TODO: Fix the redirects/ make the form appear in new window
 
 def add_contact(request):
     if request.method == 'POST':
