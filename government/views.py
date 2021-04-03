@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.db.models import Count, Max, Min, Avg
-from shared.models import People, Test, TestContacted, ContactContacted, Contact
-from datetime import date, time, datetime, timedelta
-from government.hooks.dbscan import MIN_PTS,EPS
+from django.db.models import Count, Max, Avg
+from django.utils import timezone
+
+from shared.models import Test, ContactContacted
+from datetime import date, timedelta
+from government.hooks.dbscan import MIN_PTS, EPS
+
 
 def index(request):
     return HttpResponse("Hello, Government user!.")
@@ -37,10 +40,12 @@ def get_time_description(time_frame, prev=False):
     else:
         return t
 
-def get_time_statistics(time_frame,offset):
-    #i.e. say we want the aggregate data over a week, 4 weeks ago, we would call gts(7,3). zero indexed, i.e. gts(7,0) is the most recent week of stats
-    time_threshold_0 = date.today() - timedelta(days=time_frame*(offset+1))
-    time_threshold_1 = date.today() - timedelta(days=offset*time_frame)
+
+def get_time_statistics(time_frame, offset):
+    # i.e. say we want the aggregate data over a week, 4 weeks ago, we would call gts(7,3). zero indexed, i.e. gts(7,
+    # 0) is the most recent week of stats
+    time_threshold_0 = timezone.now() - timedelta(days=time_frame * (offset + 1))
+    time_threshold_1 = timezone.now() - timedelta(days=offset * time_frame)
     test_objects = Test.objects.filter(test_date__gt=time_threshold_0).filter(test_date__lte=time_threshold_1)
 
     num_tests = test_objects.count()
@@ -52,48 +57,51 @@ def get_time_statistics(time_frame,offset):
     else:
         pos_rate = 100 * num_pos / num_tests
 
-    people_objects = People.objects.filter(test__test_date__gt=time_threshold_0).filter(test__test_date__lte=time_threshold_1)
-    people_by_contacts = people_objects.annotate(Count('contact'))
-    pos_people = People.objects.filter(test__result=True)
-
     age_groups = []
-    for i in range (0,90,10):
-        birthday = date.today() - timedelta(days=i*365)
+    for i in range(0, 90, 10):
+        birthday = timezone.now() - timedelta(days=i * 365)
         age_groups.append(birthday)
-    #by this point, age_groups is a list of the dates today, 10 years ago... up to 80 years ago
-
+    # by this point, age_groups is a list of the dates today, 10 years ago... up to 80 years ago
     age_test_data = []
-    for i in range(0,9,1):
+    for i in range(0, 9, 1):
         birthday = age_groups[i]
-        age_test_data.append(people_objects.filter(date_of_birth__gte=birthday).count())
-    for i in range(0,8,1):
-        age_test_data[i] -= age_test_data[i+1]
-    #age_data is now a list of size 9 with the number of people in the ages 0-9,10-19.. 80+ who have been tested
+        age_test_data.append(test_objects.filter(person__date_of_birth__gte=birthday).count())
 
+    for i in range(0, 8, 1):
+        age_test_data[i + 1] -= age_test_data[i]
+    # age_data is now a list of size 9 with the number of people in the ages 0-9,10-19.. 80+ who have been tested
     age_pos_data = []
-    for i in range(0,9,1):
+
+    for i in range(0, 9, 1):
         birthday = age_groups[i]
-        age_pos_data.append(pos_people.filter(date_of_birth__gte=birthday).count())
-    for i in range(0,8,1):
-        age_pos_data[i] -= age_pos_data[i+1]
-    #age_pos_data is now a list of size 9 with the number of positive cases for people in each age group
-    max_contacts = people_by_contacts.aggregate(max=Max('contact__count'))['max']
+        age_pos_data.append(pos_tests.filter(person__date_of_birth__gte=birthday).count())
+    for i in range(0, 8, 1):
+        age_pos_data[i + 1] -= age_pos_data[i]
+
+    # age_pos_data is now a list of size 9 with the number of positive cases for people in each age group
+
+    # can use same queryset thing for both max and avg
+    positives_with_contact_count = pos_tests.annotate(no_contacts=Count('contact'))
+    max_contacts = positives_with_contact_count.aggregate(max=Max('no_contacts'))['max']
     if max_contacts is None:
         max_contacts = 0
 
-    avg_contacts = people_by_contacts.aggregate(average=Avg('contact__count'))['average']
+    avg_contacts = positives_with_contact_count.aggregate(average=Avg('no_contacts'))['average']
     if avg_contacts is None:
         avg_contacts = 0
 
-    contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(date_contacted__lte=time_threshold_1).count()
+    contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(
+        date_contacted__lte=time_threshold_1).count()
 
-    return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'age_pos_data': age_pos_data, 'num': num_tests, 'pos': pos_tests, 'rate': pos_rate, 'contacted': contacted}
+    return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'age_pos_data': age_pos_data,
+            'num': num_tests, 'pos': num_pos, 'rate': pos_rate, 'contacted': contacted}
 
 
 def timebased(request, time_frame):
-
-    sn = get_time_statistics(time_frame, 0) #stats now, i.e. in the last time_frame days
-    sp = get_time_statistics(time_frame,1) # stats then, i.e. in the time_frame days before the start of the most recent time_frame
+    # stats now, i.e. in the last time_frame days
+    sn = get_time_statistics(time_frame, 0)
+    # stats then, i.e. in the time_frame days before the start of the most recent time_frame
+    sp = get_time_statistics(time_frame, 1)
     time_threshold = date.today() - timedelta(days=time_frame)
 
     return render(request, 'government/timebased.html',
