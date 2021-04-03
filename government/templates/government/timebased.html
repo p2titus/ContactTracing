@@ -305,7 +305,8 @@
             <p>In {{ time_description }}, </p>
             <ul class="datapoints-list">
                 <!-- TODO: make indicators real -->
-                <li><span class="number-highlight">{{ cases_contacted|floatformat:2 }}%</span> of positive cases were contacted by
+                <li><span class="number-highlight">{{ cases_contacted|floatformat:2 }}%</span> of positive cases were
+                    contacted by
                     tracers TODO: ACTUALLY CALCULATE THIS
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if cases_contacted >= prev_cases_contacted %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_cases_contacted|floatformat:2 }} to {{ cases_contacted|floatformat:2 }}"
@@ -315,7 +316,8 @@
                     </span>
 
                 </li>
-                <li><span class="number-highlight">{{ avg_contacts|floatformat:2 }}</span> was the average no. contacts per positive
+                <li><span class="number-highlight">{{ avg_contacts|floatformat:2 }}</span> was the average no. contacts
+                    per positive
                     case
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if avg_contacts >= prev_avg_contacts %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_avg_contacts|floatformat:2 }} to {{ avg_contacts|floatformat:2 }}"
@@ -369,24 +371,49 @@
 <script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0/build/global/luxon.min.js"
         integrity="sha256-4sbTzmCCW9LGrIh5OsN8V5Pfdad1F1MwhLAOyXKnsE0=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@0.2.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
+
 <script>
     let blue = 'rgb(54, 162, 235)';
     // will be removed when the actual data is plumbed in.
     let randomScalingFactor = function () {
         return Math.round(Math.random() * 200);
     };
+
+    var dragOptions = {
+        animationDuration: 1000
+    };
     // setup data, settings for each chart
     const configs = {
-        {% for _, chart_title, tag in charts_data %}
+        {% for current_data, prev_data, chart_title, tag in charts_data %}
             "{{tag}}": {
                 type: 'line',
                 data: {
-                    labels: [{% for day in days_range %} "{{ day.isoformat }}" , {% endfor %}],
                     datasets: [{
                         backgroundColor: blue, borderColor: blue,
-                        data: [{% for day in days_range %} randomScalingFactor(), {% endfor %}],
-                        fill: false,
-                    }]
+                        data: [  {% for point in current_data %} {
+                            x: "{{ point.day.isoformat }}",
+                            y: {{ point.count|floatformat:3 }},
+                        }, {% endfor %}
+
+                        ], fill: false,
+                    },
+
+                        {#{#}
+                        {#    backgroundColor: "#8383dd", borderColor: "#8383dd",#}
+                        {#    data: [  {% for point in prev_data %} {#}
+                        {#        x: "{{ point.day.isoformat }}",#}
+                        {#        y: {{ point.count|floatformat:3 }},#}
+                        {#    }, {% endfor %}#}
+                        {#        {#}
+                        {#            x: "{{ current_data.0.day.isoformat }}",#}
+                        {#            y: {{ current_data.0.count|floatformat:3 }},#}
+                        {#        }#}
+                        {#    ], fill: false,#}
+                        {# },#}
+
+                    ]
                 },
                 options: {
                     responsive: true,
@@ -398,7 +425,23 @@
                     tooltips: {mode: 'index', intersect: false,},
                     hover: {mode: 'nearest', intersect: true},
                     scales: {
-                        xAxes: [{display: true}], yAxes: [{display: true}]
+                        xAxes: [{
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                            },
+                            display: true
+                        }], yAxes: [{display: true}]
+                    },
+                    plugins: {
+                        zoom: {
+                            zoom: {
+                                enabled: true,
+                                drag: dragOptions,
+                                mode: 'x',
+                                speed: 1
+                            }
+                        }
                     }
                 }
             },
@@ -439,6 +482,7 @@
                 scales: {
                     xAxes: [{display: true}], yAxes: [{display: true}]
                 }
+
             }
         },
     }
@@ -449,8 +493,8 @@
             const ctx = document.getElementById(key).getContext('2d');
             new Chart(ctx, value);
         }
-         const ctx = document.getElementById("age_chart_canvas").getContext('2d');
-            new Chart(ctx, age_config);
+        const ctx = document.getElementById("age_chart_canvas").getContext('2d');
+        new Chart(ctx, age_config);
 
     };
 

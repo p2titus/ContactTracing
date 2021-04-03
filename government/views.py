@@ -1,3 +1,4 @@
+from django.db.models.functions import TruncDate
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Count, Max, Avg
@@ -93,8 +94,20 @@ def get_time_statistics(time_frame, offset):
     contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(
         date_contacted__lte=time_threshold_1).count()
 
+    tests_by_day = test_objects.annotate(day = TruncDate("test_date")).values("day").annotate(count=Count("id")).values("day", "count")
+    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").annotate(count=Count("id")).values(
+        "day", "count")
+    rate_by_day = []
+    for (pos, tests) in zip(pos_by_day, tests_by_day):
+        if pos["count"] > 0:
+            rate = pos["count"]/ tests["count"]
+        else:
+            rate = 0
+        rate_by_day.append({"day": pos["day"],
+                           "count": rate})
+
     return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'age_pos_data': age_pos_data,
-            'num': num_tests, 'pos': num_pos, 'rate': pos_rate, 'contacted': contacted}
+            'num': num_tests, 'pos': num_pos, 'rate': pos_rate, 'contacted': contacted, 'tests_by_day': tests_by_day, 'pos_by_day': pos_by_day, 'rate_by_day': rate_by_day}
 
 
 def timebased(request, time_frame):
@@ -130,9 +143,9 @@ def timebased(request, time_frame):
                       'prev_time_description': get_time_description(time_frame, True),
                       'days_range': [time_threshold + timedelta(days=x) for x in range(time_frame)],
                       # Charting information
-                      'charts_data': [(None, "Positive cases", "pos_case_canvas"),
-                                      (None, "Tests performed", "num_tests_canvas"),
-                                      (None, "Positivity rate", "pos_rate_canvas")],
+                      'charts_data': [(sn["pos_by_day"], sp["pos_by_day"], "Positive cases", "pos_case_canvas"),
+                                      (sn["tests_by_day"], sp["tests_by_day"], "Tests performed", "num_tests_canvas"),
+                                      (sn["rate_by_day"], sp["rate_by_day"], "Positivity rate", "pos_rate_canvas")],
                       # Clustering parameters
                       'min_cases_in_cluster': MIN_PTS,
                       'cluster_radius': EPS
