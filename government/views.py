@@ -27,11 +27,11 @@ def get_time_description(time_frame, prev=False):
     else:
         if time_frame % 365 == 0:
             t = "the last %d years" % (time_frame // 365)
-        if time_frame % 30 == 0:
-            t = "the last %d months" % (time_frame // 30)
-        if time_frame % 7 == 0:
+        #elif time_frame % 30 == 0:
+        #    t = "the last %d months" % (time_frame // 30)
+        elif time_frame % 7 == 0:
             t = "the last %d weeks" % (time_frame // 7)
-        if time_frame >= 2:
+        elif time_frame >= 2:
             t = "the last %d days" % time_frame
         else:  # i.e <= 0
             t = "invalid time range"
