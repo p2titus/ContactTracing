@@ -11,17 +11,26 @@ def index(request):
 
 
 def poscase(request):
-    test = views_help.next_test()
+    """test = views_help.next_test()
     if test is not None:
         context = {'success': True, 'date': test.test_date,
                    'phone': test.person.phone_num, 'name': test.person.name,
                     'form': Form({'case_id': test.id, 'case_name': test.person.name})}
     else:
-        context = {'success': False, 'error': "No positive case available"}
+        context = {'success': False, 'error': "No positive case available"}"""
+    context = {'success': False, 'error': "Page incomplete..."}
     return render(request, 'tracers/poscase.html', context)
 
-def thanks(request):
-    return HttpResponse("Result Entered")
+
+def contact(request):
+    """cont = views_help.next_contact()
+    if cont is not None:
+        context = {'success': True,
+                   'phone': cont.person.phone_num, 'name': cont.person.name}
+    else:
+        context = {'success': False, 'error': "No positive case available"}"""
+    context = {'success': False, 'error': "Page incomplete..."}
+    return render(request, 'tracers/contact.html', context)
 
 def add_contact(request):
     if request.method == 'POST':

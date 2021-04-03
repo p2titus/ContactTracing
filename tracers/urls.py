@@ -21,8 +21,9 @@ urlpatterns = [
     # Homepage, such as it is:
     path('', views.index, name="index"),
 
-    #temporary pages for displaying cases
+    #pages for displaying cases
     path('poscase/', views.poscase, name="poscase"),
-    path('add_contact/', views.add_contact, name='contact'),
+    path('contact/', views.contact, name="contact"),
+    path('add_contact/', views.add_contact, name='add_contact'),
 
 ]

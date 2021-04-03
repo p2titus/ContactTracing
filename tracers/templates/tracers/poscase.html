@@ -1,10 +1,16 @@
 {%load static%}
 <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+
+<p><form action="/tracers/poscase" type="POST">
+    <input type="submit" value="New Case" />
+</form></p>
+
 {% if success %}
     <p>Person who has tested positive</p>
-    {{name}}
-    {{phone}}
-    {{date}}
+    <p>NAME: {{name}}</p>
+    <p>PHONE: {{phone}}</p>
+    <p>DATE: {{date}}</p>
+
     <form action="/tracers/add_contact/", method="post">
     {% csrf_token %}
     {{ form }}
