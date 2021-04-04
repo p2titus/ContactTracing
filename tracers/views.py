@@ -16,8 +16,8 @@ def poscase(request):
     if test is not None:
         context = {'success': True, 'date': test.test_date,
                    'phone': test.person.phone_num, 'name': test.person.name,
-                    'form_addcontact': Form({'case_id': test.id, 'case_name': test.person.name})
-                    'form_confirm': Form({'case_id': test.id})
+                    'form_addcontact': Form({'case_id': test.id, 'case_name': test.person.name}),
+                    'form_confirm': TestContactedForm({'case_id': test.id})
                     }
     else:
         context = {'success': False, 'error': "No positive case available"}"""

@@ -20,7 +20,7 @@
     <p>Have you successfully reached this person?</p>
     <form action="/tracers/", method="post">
     {% csrf_token %}
-    {{ form_addcontact }}
+    {{ form_confim }}
     <input type="submit" value="Done">
     </form>
 {% else %}
