@@ -78,10 +78,12 @@ class ContactForm(forms.Form):
         self.input_contact(person, location)
 
 
+FINISHED_CHOICES = [(True, "Yes"), (False, "No")]
+
 # a form for updating TestContacted if successful
 class TestContactedForm(forms.Form):
     case_id = forms.IntegerField(label='Case ID', widget=forms.HiddenInput)
-    success = forms.BooleanField(label='Successfully contacted')
+    success = forms.ChoiceField(widget=forms.RadioSelect, choices=FINISHED_CHOICES, label='Successfully contacted')
 
     def confirm_call(self):
         if self.cleaned_data['success']:
@@ -95,7 +97,7 @@ class TestContactedForm(forms.Form):
 # a form for updating ContactContacted if successful
 class ContactContactedForm(forms.Form):
     contact_id = forms.IntegerField(label='Contact ID', widget=forms.HiddenInput)
-    success = forms.BooleanField(label='Successfully contacted')
+    success = forms.ChoiceField(widget=forms.RadioSelect, choices=FINISHED_CHOICES, label='Successfully contacted')
 
     def confirm_call(self):
         if self.cleaned_data['success']:
