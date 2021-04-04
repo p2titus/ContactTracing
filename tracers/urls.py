@@ -25,5 +25,6 @@ urlpatterns = [
     path('poscase/', views.poscase, name="poscase"),
     path('contact/', views.contact, name="contact"),
     path('add_contact/', views.add_contact, name='add_contact'),
+    path('add_testcontacted/', views.add_testcontacted, name='add_testcontacted'),
 
 ]

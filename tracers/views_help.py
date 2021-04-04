@@ -16,7 +16,7 @@ unexpired_claim = Q(being_contacted__exact=True) & Q(contact_start__gt=datetime.
 def tests_needing_contacting():
     return Test.objects.exclude(unexpired_claim) \
         .exclude(person__in=TestContacted.objects.values_list('case', flat=True)) \
-        .filter(result_poscontact_exact=True)
+        .filter(result__exact=True)
 
 
 # claims & returns

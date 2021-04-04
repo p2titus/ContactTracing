@@ -12,7 +12,7 @@ def index(request):
 # ideally add a warning before leaving page (here & for contact)
 # TODO: display the 'confirm' forms embedded in the pages
 def poscase(request):
-    """test = views_help.next_test()
+    test = views_help.next_test()
     if test is not None:
         context = {'success': True, 'date': test.test_date,
                    'phone': test.person.phone_num, 'name': test.person.name,
@@ -20,8 +20,7 @@ def poscase(request):
                     'form_confirm': TestContactedForm({'case_id': test.id})
                     }
     else:
-        context = {'success': False, 'error': "No positive case available"}"""
-    context = {'success': False, 'error': "Page incomplete..."}
+        context = {'success': False, 'error': "No positive case available"}
     return render(request, 'tracers/poscase.html', context)
 
 
@@ -49,3 +48,15 @@ def add_contact(request):
             return render(request, 'tracers/contactForm.html', context={'form': form})
     else:
         return HttpResponseRedirect('/tracers')
+
+def add_testcontacted(request):
+    if request.method == 'POST':
+        form = TestContactedForm(request.POST)
+        if form.is_valid():
+            form.confirm_call()
+            return HttpResponseRedirect('/tracers')
+        else:
+            return HttpResponseRedirect('/tracers')
+    else:
+        return HttpResponseRedirect('/tracers')
+
