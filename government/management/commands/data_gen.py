@@ -1,28 +1,27 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
+from datetime import timedelta
+import random
 
+from django.core.management.base import BaseCommand
 from shared.models import Test, Addresses, People, Contact
 from government.models import Area
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import PointOnSurface
-import random
-from datetime import date
 from government.hooks.dbscan import cluster
 
 UK_eastings_range = [3530514.28, 3570579.82]
 UK_northings_range = [3288094.49, 3219949.68]
 
-from datetime import timedelta
-
 
 def random_date(start, end):
-    """
-    This function will return a random datetime between two datetime
-    objects.
-    """
     delta = end - start
-    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-    random_second = random.randrange(int_delta)
-    return start + timedelta(seconds=random_second)
+
+    if delta.days < 0:
+        random_day = 0
+    else:
+        random_day = random.randrange(0, delta.days)
+
+    return start + timedelta(days=random_day)
 
 
 def generate_case(lon, lat, i):
@@ -30,12 +29,14 @@ def generate_case(lon, lat, i):
     addr.point = Point(x=lon, y=lat)
 
     p = People(name="P %s" % i, location=addr, phone_num=i, )
-    p.age = i
+    p.date_of_birth = random_date(timezone.now() - timedelta(days=365 * ((i + 1) % 100)),
+                                  timezone.now() - timedelta(days=365 * (i % 100)))
+
     p.email = "lady%s@ox.ac.uk" % i
 
     t = Test(person=p)
     t.result = bool(random.getrandbits(1))
-    t.test_date = date.today()
+    t.test_date = random_date(timezone.now() - timedelta(days=i + 1), timezone.now())
 
     return addr, p, t
 
@@ -45,7 +46,9 @@ def generate_contact(lon, lat, i, positive):
     addr.point = Point(x=lon, y=lat)
 
     p = People(name="Contact person %s" % i, location=addr, phone_num=i, )
-    p.age = i
+    p.date_of_birth = random_date(timezone.now() - timedelta(days=365 * (i % 100)),
+                                  timezone.now() - timedelta(days=365 * ((i + 1) % 100)))
+
     p.email = "contact%s@ox.ac.uk" % i
 
     c = Contact(case_contact=p, positive_case=positive, location=addr)
@@ -83,12 +86,19 @@ class Command(BaseCommand):
                 tests.append(t)
 
             Addresses.objects.bulk_create(addr)
+            last_id = Addresses.objects.latest("id").id
             for i in range(0, 4000):
-                people[i].location_id = addr[i].id
+                people[i].location_id = last_id - i
             People.objects.bulk_create(people)
+            last_id = People.objects.latest("id").id
             for i in range(0, 4000):
-                tests[i].person_id = people[i].id
+                tests[i].person_id = last_id - i
             Test.objects.bulk_create(tests)
+            last_id = Test.objects.latest("id").id
+            for i in range(0, 4000):
+                t = Test.objects.get(id=last_id - i)
+                t.test_date = random_date(timezone.now() - timedelta(days=i + 1), timezone.now())
+                t.save()
 
         elif options["generate_random_contacts"]:
             print("Generating random contacts")
@@ -98,8 +108,8 @@ class Command(BaseCommand):
             contacts = []
             for i in range(0, 4000):
                 a, p, c = generate_contact(random.uniform(UK_eastings_range[0], UK_eastings_range[1]),
-                                           random.uniform(UK_northings_range[0], UK_northings_range[1]), i,
-                                           positive_cases[i])
+                                           random.uniform(UK_northings_range[0], UK_northings_range[1]),
+                                           i, positive_cases[i])
                 addr.append(a)
                 people.append(p)
                 contacts.append(c)
@@ -122,5 +132,6 @@ class Command(BaseCommand):
                     cluster(c[0])
                 if i % 50 == 0:
                     print(i)
+
         else:
             print("You need to provide an option.")
