@@ -7,10 +7,9 @@ from .forms import *
 
 
 def index(request):
-    return HttpResponse("Hello, contact tracer!")
+    return render(request, 'tracers/index.html')
 
-# ideally add a warning before leaving page (here & for contact)
-# TODO: display the 'confirm' forms embedded in the pages
+# TODO: add a warning before leaving page (here & for contact)
 def poscase(request):
     test = views_help.next_test()
     if test is not None:
@@ -20,20 +19,19 @@ def poscase(request):
                     'form_confirm': TestContactedForm({'case_id': test.id})
                     }
     else:
-        context = {'success': False, 'error': "No positive case available"}
+        context = {'success': False, 'error': "No new positive case available"}
     return render(request, 'tracers/poscase.html', context)
 
 
 def contact(request):
-    """cont = views_help.next_contact()
+    cont = views_help.next_contact()
     if cont is not None:
         context = {'success': True,
-                   'phone': cont.person.phone_num, 'name': cont.person.name,
-                   'form_confirm': Form({'case_id': test.id})
+                   'phone': cont.case_contact.phone_num, 'name': cont.case_contact.name,
+                   'form_confirm': TestContactedForm({'case_id': cont.id})
                    }
     else:
-        context = {'success': False, 'error': "No positive case available"}"""
-    context = {'success': False, 'error': "Page incomplete..."}
+        context = {'success': False, 'error': "No new contact available"}
     return render(request, 'tracers/contact.html', context)
 
 # TODO: make the addcontact form appear in new smaller window
@@ -60,3 +58,13 @@ def add_testcontacted(request):
     else:
         return HttpResponseRedirect('/tracers')
 
+def add_contactcontacted(request):
+    if request.method == 'POST':
+        form = ContactContactedForm(request.POST)
+        if form.is_valid():
+            form.confirm_call()
+            return HttpResponseRedirect('/tracers')
+        else:
+            return HttpResponseRedirect('/tracers')
+    else:
+        return HttpResponseRedirect('/tracers')

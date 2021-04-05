@@ -35,20 +35,20 @@ def next_test():
 # by a tracer just once.
 # over a longer time period, a person would need to be
 # contacted twice if entered twice
-# TODO: add this feature or decide not to add it
+# TODO: add this feature
 def contacts_needing_contacting():
     return Contact.objects.exclude(unexpired_claim) \
-        .exclude(person__in=ContactContacted.objects.values_list('case', flat=True))
+        .exclude(case_contact__in=ContactContacted.objects.values_list('contact', flat=True))
 
 
 # claims & returns
 def next_contact():
     try:
         with transaction.atomic():
-            contact = contacts_needing_contacting().earliest('test_date')
+            contact = contacts_needing_contacting().get()
             contact.being_contacted = True
             contact.save()
-    except Test.DoesNotExist:
+    except Contact.DoesNotExist:
         contact = None
     return contact
 
