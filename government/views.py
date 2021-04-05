@@ -141,9 +141,9 @@ def get_time_statistics(time_frame, offset):
     contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(
         date_contacted__lte=time_threshold_1).count()
 
-    tests_by_day = test_objects.annotate(day=TruncDate("test_date")).values("day").annotate(count=Count("id")).values(
+    tests_by_day = test_objects.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(count=Count("id")).values(
         "day", "count")
-    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").annotate(count=Count("id")).values(
+    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(count=Count("id")).values(
         "day", "count")
     rate_by_day = []
     for (pos, tests) in zip(pos_by_day, tests_by_day):
