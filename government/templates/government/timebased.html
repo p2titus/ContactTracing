@@ -305,9 +305,8 @@
             <p>In {{ time_description }}, </p>
             <ul class="datapoints-list">
                 <!-- TODO: make indicators real -->
-                <li><span class="number-highlight">{{ cases_contacted|floatformat:2 }}%</span> of positive cases were
-                    contacted by
-                    tracers TODO: ACTUALLY CALCULATE THIS
+                <li><span class="number-highlight">Unknown{# { cases_contacted|floatformat:2 }} #}%</span> of positive
+                    cases were contacted by tracers
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if cases_contacted >= prev_cases_contacted %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_cases_contacted|floatformat:2 }} to {{ cases_contacted|floatformat:2 }}"
                           class="badge {% if cases_contacted >= prev_cases_contacted %}bg-success{% else %}bg-danger{% endif %} align-text-top">
@@ -316,9 +315,8 @@
                     </span>
 
                 </li>
-                <li><span class="number-highlight">{{ avg_contacts|floatformat:2 }}</span> was the average no. contacts
-                    per positive
-                    case
+                <li><span class="number-highlight">{{ avg_contacts|floatformat:2 }}</span> was the average number of
+                    contacts per positive case
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if avg_contacts >= prev_avg_contacts %}Increase{% else %}Decrease{% endif %} over  {{ prev_time_description }} from {{ prev_avg_contacts|floatformat:2 }} to {{ avg_contacts|floatformat:2 }}"
                           class="badge {% if avg_contacts >= prev_avg_contacts %}bg-danger{% else %}bg-success{% endif %} align-text-top">
