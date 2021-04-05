@@ -431,7 +431,12 @@
                                 unit: 'day',
                             },
                             display: true
-                        }], yAxes: [{display: true}]
+                        }], yAxes: [{
+                            display: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
                     },
                     plugins: {
                         zoom: {
