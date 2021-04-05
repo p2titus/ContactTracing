@@ -1,19 +1,19 @@
-from django.db.models.functions import TruncDate
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.utils import timezone
+from datetime import date, timedelta
 
-from django.template import loader
-from government.models import Area, Cluster
 from django.db import connection
 from django.db.models import Count, Max, Avg
-from shared.models import Test, ContactContacted
-from datetime import date, timedelta
+from django.db.models.functions import TruncDate
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.utils import timezone
+
 from government.hooks.dbscan import MIN_PTS, EPS
+from government.models import Area, Cluster
+from shared.models import Test, ContactContacted
 
 
 def index(request):
-    return "Hello!"
+    return HttpResponse("Hello!")
 
 
 def get_geographic_data(start_day):
@@ -55,11 +55,9 @@ group by ga.id;
     return data
 
 
-def clusters(request):
-    data = Cluster.objects.all()
-
-    template = loader.get_template("government/clusters.html")
-    return HttpResponse(template.render({"clusters": list(data)}, request))
+def clusters(time_frame):
+    data = Cluster.objects.filter(end_date__gte=time_frame)
+    return list(data)
 
 
 pretty_times = {
@@ -201,7 +199,7 @@ def timebased(request, time_frame):
                       'min_cases_in_cluster': MIN_PTS,
                       'cluster_radius': EPS,
                       # clustering data
-                      "clusters": list(Cluster.objects.all()),
+                      "clusters": clusters(time_threshold),
                       # geographic areas data
                       "areas": get_geographic_data(time_threshold)
 

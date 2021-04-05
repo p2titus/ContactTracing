@@ -1,7 +1,9 @@
 from django.contrib.gis.db import models
-from django.db.models import Count, Max, Min, Avg
+from django.contrib.postgres.fields import ArrayField
+
 from shared.models import People, Test, TestContacted, ContactContacted, Contact
-from datetime import date, time, datetime, timedelta
+
+
 # Create your models here.
 
 class Area(models.Model):
@@ -24,7 +26,11 @@ class Cluster(models.Model):
     cluster_id = models.UUIDField(primary_key=True)
     # A generated polygon around the points in this cluster.
     area = models.PolygonField()
-    points_in_cluster = models.IntegerField(default=0)
+    cluster_size = models.IntegerField(default=0)
+    indices = ArrayField(models.IntegerField())
+    start_date = models.DateField()
+    end_date = models.DateField()
+
 
 
 

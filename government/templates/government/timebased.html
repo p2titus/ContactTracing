@@ -177,7 +177,7 @@
                             <tr>
                                 <th scope="col">{{ nice_name }}</th>
                                 <th scope="col">Cases in the {{ time_description }}</th>
-                                <th scope="col">Per-Capita or something?????</th>
+                                <th scope="col">Cases per 100,000</th>
 
                             </tr>
                             </thead>
@@ -186,7 +186,7 @@
                                 <tr>
                                     <th scope="row">{{ area.name }}</th>
                                     <td>{{ area.alltime_count }}</td>
-                                    <td> ??</td>
+                                    <td>Data unavailable</td>
                                 </tr>
 
                             {% endfor %}
@@ -245,8 +245,8 @@
 
             </ul>
             <p>These contacts occurred in several clusters across the country, where a cluster is made up of at
-                least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other.</p>
-            <b>Warning: these clusters are for all time, at the moment.</b>
+                least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other. A cluster is shown on
+                the map if at least one case in it occurred in {{ time_description }}.</p>
             <div id="clusters-map" style="height: 40vh;"></div>
         </div>
 
@@ -336,7 +336,9 @@
                                 unit: 'day',
                             },
                             display: true
-                        }], yAxes: [{display: true}]
+                        }], yAxes: [{
+                            display: true
+                        }]
                     },
                     plugins: {
                         zoom: {
