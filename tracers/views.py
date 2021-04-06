@@ -18,6 +18,8 @@ def poscase(request):
                     'form_addcontact': Form({'case_id': test.id, 'case_name': test.person.name}),
                     'form_confirm': TestContactedForm({'case_id': test.id})
                     }
+        print("test id is")
+        print(test.id)
     else:
         context = {'success': False, 'error': "No new positive case available"}
     return render(request, 'tracers/poscase.html', context)
@@ -28,8 +30,10 @@ def contact(request):
     if cont is not None:
         context = {'success': True,
                    'phone': cont.case_contact.phone_num, 'name': cont.case_contact.name,
-                   'form_confirm': TestContactedForm({'case_id': cont.id})
+                   'form_confirm': ContactContactedForm({'contact_id': cont.id})
                    }
+        print("contact id is")
+        print(cont.id)
     else:
         context = {'success': False, 'error': "No new contact available"}
     return render(request, 'tracers/contact.html', context)
@@ -41,7 +45,7 @@ def add_contact(request):
         form = ContactForm(request.POST)
         if form.is_valid():
             form.add_contact()
-            return HttpResponseRedirect('/tracers')
+            return HttpResponse('<script type="text/javascript">window.close()</script>')
         else:
             return render(request, 'tracers/contactForm.html', context={'form': form})
     else:
@@ -54,9 +58,9 @@ def add_testcontacted(request):
             form.confirm_call()
             return HttpResponseRedirect('/tracers')
         else:
-            return HttpResponseRedirect('/tracers')
+            return HttpResponseRedirect('/tracers/error')
     else:
-        return HttpResponseRedirect('/tracers')
+        return HttpResponseRedirect('/tracers/error')
 
 def add_contactcontacted(request):
     if request.method == 'POST':
@@ -65,6 +69,10 @@ def add_contactcontacted(request):
             form.confirm_call()
             return HttpResponseRedirect('/tracers')
         else:
-            return HttpResponseRedirect('/tracers')
+            return HttpResponseRedirect('/tracers/error')
     else:
-        return HttpResponseRedirect('/tracers')
+        return HttpResponseRedirect('/tracers/error')
+
+
+def error(request):
+    return HttpResponse('There was an error')
