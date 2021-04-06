@@ -7,7 +7,8 @@ from django.db.models import Q
 # time after which claim expires
 expiry_time = timedelta(hours=1)
 # condition for a person to be claimed (ie should be filtered out)
-unexpired_claim = Q(being_contacted__exact=True) & Q(contact_start__gt=datetime.datetime.now(timezone.utc) - expiry_time)
+unexpired_claim = Q(being_contacted__exact=True) \
+                  & Q(contact_start__gt=datetime.datetime.now(timezone.utc) - expiry_time)
 
 
 # for reference, in this datetime representation, future > past
@@ -23,8 +24,10 @@ def tests_needing_contacting():
 def next_test():
     try:
         with transaction.atomic():
+            now = datetime.datetime.now(timezone.utc)
             test = tests_needing_contacting().earliest('test_date')
             test.being_contacted = True
+            test.contact_start = now
             test.save()
     except Test.DoesNotExist:
         test = None
@@ -45,9 +48,12 @@ def contacts_needing_contacting():
 def next_contact():
     try:
         with transaction.atomic():
-            contact = contacts_needing_contacting().get()
-            contact.being_contacted = True
-            contact.save()
+            now = datetime.datetime.now(timezone.utc)
+            contact = contacts_needing_contacting().first()
+            if contact is not None:
+                contact.being_contacted = True
+                contact.contact_start = now
+                contact.save()
     except Contact.DoesNotExist:
         contact = None
     return contact
@@ -64,4 +70,3 @@ def refresh_claim(psn):
             return True
         else:
             return False
-
