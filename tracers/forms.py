@@ -101,7 +101,7 @@ class ContactContactedForm(forms.Form):
 
     def confirm_call(self):
         if self.cleaned_data['success']:
-            contact = Contact.objects.get(pk=self.cleaned_data['case_id'])
+            contact = Contact.objects.get(pk=self.cleaned_data['contact_id'])
             c = ContactContacted(
                 contact=contact
             )
