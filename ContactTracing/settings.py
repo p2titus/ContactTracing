@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'shared.apps.SharedConfig',
     'government.apps.GovernmentConfig',
+    'testingCentre.apps.TestingCentreConfig',
     'tracers.apps.TracersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
