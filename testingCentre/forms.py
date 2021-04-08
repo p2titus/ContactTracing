@@ -37,7 +37,7 @@ class SingleTestForm(forms.Form):
                     phone_num=self.cleaned_data['phone_num'],
                     date_of_birth=self.cleaned_data['date_of_birth'],
                     email=self.cleaned_data['email'],
-                    location=Addresses.objects.get(pk=location)
+                    location=location
                 )
             else:
                 p = People(
