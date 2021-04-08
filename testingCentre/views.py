@@ -22,9 +22,9 @@ def add_person(request):
         form = SingleTestForm(request.POST)
         if form.is_valid():
             form.add_person()
-            return HttpResponseRedirect('singleTest/thanks/')
+            return HttpResponseRedirect('/testingCentre/singleTest/thanks/')
     else:
-        return HttpResponseRedirect('singleTest/')
+        return HttpResponseRedirect('/testingCentre/singleTest/')
 
 class InputSingleTestView(generic.FormView):
     template_name = 'testingCentre/singleTest.html'
