@@ -19,8 +19,8 @@ def setup(params: dict) -> (pika.connection.channel.Channel, str):
     host = params['host']
     con = pika.BlockingConnection(pika.ConnectionParameters(host))
     chan = con.channel()
-    chan.queue_declare(queue=POS_CASE)
-    chan.queue_declare(queue=IN_CONTACT)
+    chan.queue_declare(queue=POS_CASE, durable=True)
+    chan.queue_declare(queue=IN_CONTACT, durable=True)
     return chan, con
 
 
