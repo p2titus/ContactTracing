@@ -1,0 +1,11 @@
+an implementation of a rabbitmq server
+used to keep a distributed queue of positive cases to be contact traced
+also keeps contacts to be traced
+
+the queue will be as resilient to failure as possible
+in the event of a failure, there should be some recovery protocol
+
+this collection of code does not necessarily have to be run on the same server
+as the website, but it must be run and configured correctly to allow django to
+function as required
+
