@@ -10,6 +10,20 @@
     <p>NAME: {{name}}</p>
     <p>PHONE: {{phone}}</p>
     <p>DATE: {{date}}</p>
+
+    <form action="/tracers/add_contact/", target="_blank" method="post">
+    {% csrf_token %}
+    {{ form_addcontact }}
+    <input type="submit" value="Add Contact">
+    </form>
+
+    <p>Have you successfully reached this person?</p>
+    <form action="/tracers/add_testcontacted/", method="post">
+    {% csrf_token %}
+    {{ form_confirm }}
+    <input type="submit" value="Done">
+    </form>
 {% else %}
     {{error}}
 {% endif %}
+
