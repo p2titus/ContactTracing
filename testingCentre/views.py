@@ -18,25 +18,17 @@ def thanks(request):
     return HttpResponse("Result Entered")
 
 def add_person(request):
-    print('\nstart\n')
     if request.method == 'POST':
         form = SingleTestForm(request.POST)
-        print('form put in var')
         if form.is_valid():
-            print('\na\n')
             import tracer_queues
             case = extract_case_data(form)
-            print('\nflag\n')
             if case is not None:
                 tracer_queues.main.add_poscase(case)
             form.add_person()
 
             return HttpResponseRedirect('/testingCentre/singleTest/thanks/')
-        else:
-            print('fail')
-            return None
     else:
-        print('\nb\n')
         return HttpResponseRedirect('/testingCentre/singleTest/')
 
 
