@@ -9,3 +9,8 @@ this collection of code does not necessarily have to be run on the same server
 as the website, but it must be run and configured correctly to allow django to
 function as required
 
+the idea at the moment is to use an RPC like pattern (as detailed at 
+https://en.wikipedia.org/wiki/Remote_procedure_call - the idea is that 
+computation is performed in a different address space) but with the contact
+tracers and their 'tracing' forming the remote computation.
+
