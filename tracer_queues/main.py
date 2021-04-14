@@ -7,10 +7,14 @@ POS_CASE = 'pos_case'
 IN_CONTACT = 'in_contact'
 PARAM_FILE = 'param.json'
 RABBITMQ_STARTUP_SCRIPT = 'start_rabbitmq.sh'
+HOSTNAME = None
+PORT = 25672
 
 
 def main():
     params = parse()
+    global HOSTNAME
+    HOSTNAME = params['host']
     start_server(params)
     chan, con = setup(params=params)
     print('queues created')
@@ -19,11 +23,10 @@ def main():
 
 
 def start_server(params):
-    default_port = 25672
     import socket
     # check to see if server listening on default port
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        server_active = s.connect_ex(params['host'], default_port)
+        server_active = s.connect_ex(params['host'], PORT)
     # start server via bash script if it isn't already running
     if not server_active:
         import subprocess
@@ -44,6 +47,12 @@ def parse():
     with open(PARAM_FILE) as f:
         data = json.load(f)
     return data
+
+
+# used to add positive cases to the queue
+def add_poscase(case):
+    chan, con = setup({'host': HOSTNAME})
+    chan.basic_publish(exchange='', routing_key=POS_CASE, body=case)
 
 
 if __name__ == '__main__':
