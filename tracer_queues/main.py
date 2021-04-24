@@ -22,7 +22,9 @@ def main():
     con.close()
 
 
-def start_server(params):
+def start_server(params=None):
+    if params is None:
+        params = {'host': HOSTNAME}
     import socket
     # check to see if server listening on default port
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -51,8 +53,17 @@ def parse():
 
 # used to add positive cases to the queue
 def add_poscase(case):
-    chan, con = setup({'host': HOSTNAME})
+    chan, con = setup()
     chan.basic_publish(exchange='', routing_key=POS_CASE, body=case)
+
+
+def get_poscase() -> dict:
+    def callback()
+
+    chan, con = setup({'host': HOSTNAME})
+    ds = chan.start_consuming()
+
+
 
 
 if __name__ == '__main__':
