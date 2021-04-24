@@ -14,3 +14,12 @@ https://en.wikipedia.org/wiki/Remote_procedure_call - the idea is that
 computation is performed in a different address space) but with the contact
 tracers and their 'tracing' forming the remote computation.
 
+for now, we are doing a simple implementation where creation of a user adds it
+to the queue, and tracing retrieves them
+
+this will need to be augmented with:
+returning contacts to the queue if they haven't been confirmed in a period of
+time/aren't able to be reached
+publisher confirms (to ensure that all contacts are written successfully)
+some mechanism for synchronising different database instances so that
+statistics can be run correctly on any given web server

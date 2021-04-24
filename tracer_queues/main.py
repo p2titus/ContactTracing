@@ -57,14 +57,5 @@ def add_poscase(case):
     chan.basic_publish(exchange='', routing_key=POS_CASE, body=case)
 
 
-def get_poscase() -> dict:
-    def callback()
-
-    chan, con = setup({'host': HOSTNAME})
-    ds = chan.start_consuming()
-
-
-
-
 if __name__ == '__main__':
     main()
