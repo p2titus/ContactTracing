@@ -62,24 +62,41 @@ def add_poscase(case):
 
 
 def retrieve_pos_case():
-    return __retrieve_person(POS_CASE)
+    rp = RetrievePerson()
+    return rp.retrieve_person(POS_CASE)
 
 
 def retrieve_contact():
-    return __retrieve_person(IN_CONTACT)
+    rp = RetrievePerson()
+    return rp.retrieve_person(IN_CONTACT)
 
 
-def __retrieve_person(chan_name):
-    def callback(ch, method, propertise, body):
-        print('received %r' % body)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-        return body
+# TODO - find a more proper solution before production
+class RetrievePerson:
+    __response = None
 
-    chan, con = setup()
+    def retrieve_person(self, chan_name):
 
-    chan.basic_qos(prefetch_count=1)
-    chan.basic_consume(queue=chan_name, on_message_callback=callback)
-    chan.start_consuming()
+        def callback(ch, method, properties, body):
+            print('received %r' % body)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            self.__response = body
+
+        chan, con = setup()
+
+        chan.basic_qos(prefetch_count=1)
+        chan.basic_consume(queue=chan_name, on_message_callback=callback)
+        chan.start_consuming()
+
+        count = 0
+        max = 500
+
+        while self.__response is None and count < max:
+            count += 1
+            import time
+            time.sleep(10)
+
+        return self.__response
 
 
 if __name__ == '__main__':
