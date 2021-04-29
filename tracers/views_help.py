@@ -21,8 +21,9 @@ def tests_needing_contacting():
 
 
 # claims & returns
+# TODO - test rabbitmq used correctly
 def next_test():
-    try:
+    '''try:
         with transaction.atomic():
             now = datetime.datetime.now(timezone.utc)
             test = tests_needing_contacting().earliest('test_date')
@@ -30,7 +31,9 @@ def next_test():
             test.contact_start = now
             test.save()
     except Test.DoesNotExist:
-        test = None
+        test = None'''
+    import tracer_queues
+    test = tracer_queues.retrieve_pos_case()
     return test
 
 
@@ -45,8 +48,9 @@ def contacts_needing_contacting():
 
 
 # claims & returns
+# TODO - check rabbitmq used correctly
 def next_contact():
-    try:
+    '''try:
         with transaction.atomic():
             now = datetime.datetime.now(timezone.utc)
             contact = contacts_needing_contacting().first()
@@ -55,7 +59,9 @@ def next_contact():
                 contact.contact_start = now
                 contact.save()
     except Contact.DoesNotExist:
-        contact = None
+        contact = None'''
+    import tracer_queues
+    contact = tracer_queues.retrieve_contact()
     return contact
 
 

@@ -24,6 +24,7 @@ def add_person(request):
             import tracer_queues
             case = extract_case_data(form)
             if case is not None:
+                import tracer_queues
                 tracer_queues.main.add_poscase(case)
             form.add_person()
 
