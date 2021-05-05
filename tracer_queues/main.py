@@ -6,37 +6,39 @@ import json
 POS_CASE = 'pos_case'
 IN_CONTACT = 'in_contact'
 PARAM_FILE = 'param.json'
-RABBITMQ_STARTUP_SCRIPT = 'start_rabbitmq.sh'
+RABBITMQ_STARTUP_SCRIPT = './start_rabbitmq.sh'
 HOSTNAME = None
 PORT = 25672
 PERSISTENT = 2
 
 
-def main():
+def run_server_instance():
     params = parse()
-    global HOSTNAME
-    HOSTNAME = params['host']
+    if params is not None:
+        global HOSTNAME
+        HOSTNAME = params['host']
     start_server(params)
     chan, con = setup(params=params)
     print('queues created')
-    input('press enter to close this connection to rabbit-mq gracefully')
+    input('press enter to close this connection to rabbit-mq gracefully\n')
     con.close()
 
 
 def start_server(params=None):
-    if params is None:
+    '''if params is None:
         params = {'host': HOSTNAME}
     import socket
     # check to see if server listening on default port
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        server_active = s.connect_ex(params['host'], PORT)
+        server_active = s.connect_ex((params['host'], PORT))
     # start server via bash script if it isn't already running
     if not server_active:
         import subprocess
-        subprocess.call(RABBITMQ_STARTUP_SCRIPT)
+        subprocess.call(RABBITMQ_STARTUP_SCRIPT)'''
+    pass  # TODO - get this working
 
 
-def setup(params: dict) -> (pika.connection.channel.Channel, str):
+def setup(params: dict):
     host = params['host']
     con = pika.BlockingConnection(pika.ConnectionParameters(host))
     chan = con.channel()
@@ -46,9 +48,12 @@ def setup(params: dict) -> (pika.connection.channel.Channel, str):
 
 
 def parse():
-    global PARAM_FILE
-    with open(PARAM_FILE) as f:
-        data = json.load(f)
+    import os
+    if os.path.isfile(PARAM_FILE):
+        with open(PARAM_FILE) as f:
+            data = json.load(f)
+    else:
+        data = None
     return data
 
 
@@ -71,7 +76,6 @@ def retrieve_contact():
     return rp.retrieve_person(IN_CONTACT)
 
 
-# TODO - find a more proper solution before production
 class RetrievePerson:
     __response = None
 
@@ -88,16 +92,18 @@ class RetrievePerson:
         chan.basic_consume(queue=chan_name, on_message_callback=callback)
         chan.start_consuming()
 
+        # with these figures, it checks the queue 20 times (once per millisecond) for a total of 20ms then continues
         count = 0
-        max = 500
+        max = 20
+        interval = 0.01  # 0.01s
 
         while self.__response is None and count < max:
             count += 1
             import time
-            time.sleep(10)
+            time.sleep(interval)
 
         return self.__response
 
 
 if __name__ == '__main__':
-    main()
+    run_server_instance()

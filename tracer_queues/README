@@ -23,3 +23,19 @@ time/aren't able to be reached
 publisher confirms (to ensure that all contacts are written successfully)
 some mechanism for synchronising different database instances so that
 statistics can be run correctly on any given web server
+
+
+---
+
+TODO
+When adding users to the system, PUSH them to an exchange that will allow all
+copies of the webserver to write them to local storage
+
+When a case is POSITIVE, PUSH them to a central queue of some kind - this queue
+must act as a singleton under concurrent access
+
+Same must apply to contacts
+
+Updates and deletions to database entries must be dealt with in the same way as
+adding users to the system
+
