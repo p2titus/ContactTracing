@@ -2,17 +2,23 @@ from django import forms
 from shared.models import People, Addresses, Test
 import datetime
 
+# will run into problems if people start living more than 150 years
+current_year = datetime.datetime.today().year
+possible_years = list(range(current_year, current_year-150, -1))
+
+max_name_len = 256
+max_phone_len = 13
+max_addr_len = 256
+max_post_len = 8
+
 class SingleTestForm(forms.Form):
-    year = datetime.datetime.today().year
-    # will run into problems if people start living more than 150 years
-    years = list(range(year, year-150, -1))
-    name = forms.CharField(label='Name', max_length=256)
-    date_of_birth = forms.DateField(label='Date of Birth', widget=forms.SelectDateWidget(years=years))
-    phone_num = forms.CharField(label='Phone number', max_length=13)
+    name = forms.CharField(label='Name', max_length=max_name_len)
+    date_of_birth = forms.DateField(label='Date of Birth', widget=forms.SelectDateWidget(years=possible_years))
+    phone_num = forms.CharField(label='Phone number', max_length=max_phone_len)
     email = forms.EmailField(label='Email')
-    addr = forms.CharField(label='Address', max_length=256)
-    postcode = forms.CharField(label='Postcode', max_length=8)
-    test_date = forms.DateTimeField(label='Date of Test', widget=forms.SelectDateWidget(years=years))
+    addr = forms.CharField(label='Address', max_length=max_addr_len)
+    postcode = forms.CharField(label='Postcode', max_length=max_post_len)
+    test_date = forms.DateTimeField(label='Date of Test', widget=forms.SelectDateWidget(years=possible_years))
     result = forms.BooleanField(label='Positive test?', required=False)
 
     # find if a person already exists in the database. Enter them if not and return the pk.
@@ -69,3 +75,58 @@ class SingleTestForm(forms.Form):
         person = self.lookup_person()
         self.input_test(person)
         self.send_text()
+
+class MultipleTestsForm(forms.Form):
+    tests_file = forms.FileField()
+    date_format = "%d/%m/%y"
+
+    # ensure that the data in the JSON file is convertible to Addresses, People, and Test objects
+    def check_data(self, data):
+        for test_dict in data:            
+            assert(type(test_dict) is dict)
+            assert(type(test_dict['name']) is str and len(test_dict['name']) <= max_name_len)
+            assert(type(test_dict['date of birth']) is str)
+            datetime.datetime.strptime(test_dict['date of birth'], self.date_format)
+            assert(type(test_dict['phone']) is str and len(test_dict['phone']) <= max_phone_len)
+            assert(type(test_dict['email']) is str)
+            assert(type(test_dict['address']) is str and len(test_dict['address']) <= max_addr_len)
+            assert(type(test_dict['postcode']) is str and len(test_dict['postcode']) <= max_post_len)
+            assert(type(test_dict['test date']) is str)
+            datetime.datetime.strptime(test_dict['test date'], self.date_format)
+            assert(type(test_dict['test result']) is bool)
+
+    # convert the data to the corresponding model objects and save them
+    def add_tests(self, data):
+        for test_dict in data:
+            print(test_dict)
+            date_of_birth = datetime.datetime.strptime(test_dict['date of birth'], self.date_format).date()
+            test_date = datetime.datetime.strptime(test_dict['test date'], self.date_format).date()
+            
+            existing_address = Addresses.objects.filter(addr__exact=test_dict['address'],
+                                                        postcode__exact=test_dict['postcode'])
+            assert(existing_address.count() <= 1)
+            if existing_address.count() == 1:
+                location = existing_address.first()
+                existing_person = location.people_set.filter(name__exact=test_dict['name'],
+                                                             phone_num__exact=test_dict['phone'],
+                                                             email__exact=test_dict['email'],
+                                                             date_of_birth__exact=date_of_birth)
+                assert(existing_person.count() <= 1)
+                if existing_person.count() == 1:
+                    person = existing_person.first()
+                else:
+                    person = None
+            else:
+                location = Addresses(addr=test_dict['address'], postcode=test_dict['postcode'])
+                person = None
+            
+            location.save()
+            if person == None:
+                person = People(name = test_dict['name'],
+                                phone_num = test_dict['phone'],
+                                date_of_birth = date_of_birth,
+                                email = test_dict['email'],
+                                location = location)
+            person.save()
+            test = Test(person=person, test_date=test_date, result=test_dict['test result'])
+            test.save()

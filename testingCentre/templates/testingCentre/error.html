@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enter JSON</title>
+</head>
+<body>
+<h3> Incorrect Data Format Found in File </h3>
+<p>
+Example of data with correct format:
+[ { "name":"James", "date of birth":"20/06/18", "phone":"12345678", "email":"jamesyinjie@haha.com", "address":"Hefei", "postcode":"214000", "test date":"01/05/21", "test result":false },
+  { "name":"Gnabry", "date of birth":"10/09/96", "phone":"44573236", "email":"serge.gnabry@fcbayern.de", "address":"Allianz Arena", "postcode":"Ummm", "test date":"05/04/21", "test result":true }
+]
+</p>
+<form><button type="submit" formaction="{% url 'testingCentre:multipleTests' %}">Return</button></form>
+</body>
+</html>

@@ -7,8 +7,12 @@ urlpatterns = [
     path('', views.LoginView.as_view(), name='login'),
     # ex: /testingCentre/choose/
     path('choose/', views.ChooseInputMethodView.as_view(), name='chooseInputMethod'),
-    # ex: /testingCentre/CSV/
-    path('CSV/', views.InputCSVView.as_view(), name='csv'),
+    # ex: /testingCentre/multipleTests/
+    path('multipleTests/', views.InputMultipleTestsView.as_view(), name='multipleTests'),
+    # /testingCentre/multipleTests/thanks/
+    path('multipleTests/thanks/', views.thanks, name='multipleTestsThanks'),
+    # /testingCentre/multipleTests/error/
+    path('multipleTests/error/', views.DataFormatErrorView.as_view(), name='multipleTestsError'),
     # ex: /testingCentre/singleTest/
     path('singleTest/', views.InputSingleTestView.as_view(), name='singleTest'),
     # /testingCentre/thanks/
