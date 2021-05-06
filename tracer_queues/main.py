@@ -1,3 +1,5 @@
+import datetime
+
 import pika
 import json
 
@@ -7,7 +9,7 @@ POS_CASE = 'pos_case'
 IN_CONTACT = 'in_contact'
 PARAM_FILE = 'param.json'
 RABBITMQ_STARTUP_SCRIPT = './start_rabbitmq.sh'
-HOSTNAME = None
+HOSTNAME = 'localhost'  # default value given for testing
 PORT = 25672
 PERSISTENT = 2
 
@@ -39,11 +41,15 @@ def start_server(params=None):
 
 
 def setup(params: dict):
-    host = params['host']
+    if params is None:
+        host = HOSTNAME
+    else:
+        host = params['host']
     con = pika.BlockingConnection(pika.ConnectionParameters(host))
     chan = con.channel()
     chan.queue_declare(queue=POS_CASE, durable=True)
     chan.queue_declare(queue=IN_CONTACT, durable=True)
+    chan.basic_qos(prefetch_count=1)
     return chan, con
 
 
@@ -58,12 +64,23 @@ def parse():
 
 
 # used to add positive cases to the queue
-def add_poscase(case):
-    chan, con = setup()
-    chan.basic_publish(exchange='', routing_key=POS_CASE, body=case,
+async def add_poscase(case):
+    chan, con = setup(None)
+    dte = DateTimeEncoder()
+    chan.basic_publish(exchange='', routing_key=POS_CASE, body=dte.encode(case),
                        properties=pika.BasicProperties(
                            delivery_mode=PERSISTENT,
                        ))
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    import typing
+
+    def default(self, o: typing.Any) -> typing.Any:
+        if isinstance(o, (datetime.date, datetime.datetime)):
+            return o.isoformat()
+        else:
+            json.dumps(o)
 
 
 def retrieve_pos_case():
@@ -79,20 +96,31 @@ def retrieve_contact():
 class RetrievePerson:
     __response = None
 
+    @staticmethod
+    def __date_time_decoder(xs):
+        import dateutil
+
+        date_field_name = 'test_date'
+
+        if date_field_name in xs:
+            xs[date_field_name] = dateutil.parser.parse(xs[date_field_name])
+            return xs
+
     def retrieve_person(self, chan_name):
 
         def callback(ch, method, properties, body):
             print('received %r' % body)
+            self.__response = json.loads(body, object_hook=self.__date_time_decoder)
             ch.basic_ack(delivery_tag=method.delivery_tag)
-            self.__response = body
 
-        chan, con = setup()
+        chan, con = setup(None)
 
         chan.basic_qos(prefetch_count=1)
         chan.basic_consume(queue=chan_name, on_message_callback=callback)
         chan.start_consuming()
 
         # with these figures, it checks the queue 20 times (once per millisecond) for a total of 20ms then continues
+        # this parameter may need to be made longer to allow for more checks
         count = 0
         max = 20
         interval = 0.01  # 0.01s
