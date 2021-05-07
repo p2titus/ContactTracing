@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views import generic
 from . import views_help
 from .forms import *
-
+from tracer_queues import add_contact
 
 
 def index(request):
@@ -44,12 +44,29 @@ def add_contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
+            case = __extract_case_data(form)
+            add_contact(case)
             form.add_contact()
             return HttpResponse('<script type="text/javascript">window.close()</script>')
         else:
             return render(request, 'tracers/contactForm.html', context={'form': form})
     else:
         return HttpResponseRedirect('/tracers')
+
+
+# duplicate of same named function found in testingCentre/views
+def __extract_case_data(form):
+    x = None
+    if form.cleaned_data['result'] is True:
+        x = {
+            'name': form.cleaned_data['name'],
+            'phone_num': form.cleaned_data['phone_num'],
+            'date_of_birth': form.cleaned_data['date_of_birth'],
+            'email': form.cleaned_data['email'],
+            'test_date': form.cleaned_data['test_date']
+        }
+    return x
+
 
 def add_testcontacted(request):
     if request.method == 'POST':
