@@ -1,5 +1,6 @@
 from django import forms
 from shared.models import People, Addresses, Test
+from django.core.validators import validate_email
 import datetime
 
 # will run into problems if people start living more than 150 years
@@ -62,9 +63,10 @@ class SingleTestForm(forms.Form):
     def input_test(self, personID):
         t = Test(
             person=People(pk=personID),
-            test_date=self.cleaned_data['test_date'],
             result=self.cleaned_data['result']
         )
+        t.save()
+        t.test_date = self.cleaned_data['test_date']
         t.save()
 
     def send_text(self):
@@ -85,20 +87,17 @@ class MultipleTestsForm(forms.Form):
         for test_dict in data:            
             assert(type(test_dict) is dict)
             assert(type(test_dict['name']) is str and len(test_dict['name']) <= max_name_len)
-            assert(type(test_dict['date of birth']) is str)
-            datetime.datetime.strptime(test_dict['date of birth'], self.date_format)
+            assert(datetime.datetime.strptime(test_dict['date of birth'], self.date_format).date().year in possible_years)
             assert(type(test_dict['phone']) is str and len(test_dict['phone']) <= max_phone_len)
-            assert(type(test_dict['email']) is str)
+            validate_email(test_dict['email'])
             assert(type(test_dict['address']) is str and len(test_dict['address']) <= max_addr_len)
             assert(type(test_dict['postcode']) is str and len(test_dict['postcode']) <= max_post_len)
-            assert(type(test_dict['test date']) is str)
-            datetime.datetime.strptime(test_dict['test date'], self.date_format)
+            assert(datetime.datetime.strptime(test_dict['test date'], self.date_format).date().year in possible_years)
             assert(type(test_dict['test result']) is bool)
 
     # convert the data to the corresponding model objects and save them
     def add_tests(self, data):
         for test_dict in data:
-            print(test_dict)
             date_of_birth = datetime.datetime.strptime(test_dict['date of birth'], self.date_format).date()
             test_date = datetime.datetime.strptime(test_dict['test date'], self.date_format).date()
             
@@ -128,5 +127,9 @@ class MultipleTestsForm(forms.Form):
                                 email = test_dict['email'],
                                 location = location)
             person.save()
-            test = Test(person=person, test_date=test_date, result=test_dict['test result'])
+            
+            test = Test(person=person,
+                        result=test_dict['test result'])
+            test.save()
+            test.test_date = test_date
             test.save()

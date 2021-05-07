@@ -18,8 +18,8 @@ class InputMultipleTestsView(generic.FormView):
     success_url = "/testingCentre/multipleTests/thanks"
 
     def form_valid(self, form):
-        data = json.load(form.cleaned_data['tests_file'])
         try:
+            data = json.load(form.cleaned_data['tests_file'])
             form.check_data(data)
         except:
             return HttpResponseRedirect('/testingCentre/multipleTests/error')
@@ -29,8 +29,8 @@ class InputMultipleTestsView(generic.FormView):
 class DataFormatErrorView(generic.TemplateView):
     template_name = "testingCentre/error.html"
 
-def thanks(request):
-    return HttpResponse("Result Entered")
+class ResultEnteredView(generic.TemplateView):
+    template_name = "testingCentre/thanks.html"
 
 def add_person(request):
     if request.method == 'POST':
