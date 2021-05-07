@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views import generic
 from . import views_help
 from .forms import *
-from tracer_queues import add_contact
+from tracer_queues import add_contact, add_poscase
 
 
 def index(request):
@@ -68,11 +68,19 @@ def __extract_case_data(form):
     return x
 
 
+# used to query whether a contact has been reached or not
+# if a contact is not reached, it is pushed back into the tracer queue
+__success_field_name = 'success'
+
+
 def add_testcontacted(request):
     if request.method == 'POST':
         form = TestContactedForm(request.POST)
         if form.is_valid():
             form.confirm_call()
+            if form.cleaned_data[__success_field_name] is False:
+                case = __extract_case_data(form)
+                add_poscase(case)
             return HttpResponseRedirect('/tracers')
         else:
             return HttpResponseRedirect('/tracers/error')
@@ -84,6 +92,9 @@ def add_contactcontacted(request):
         form = ContactContactedForm(request.POST)
         if form.is_valid():
             form.confirm_call()
+            if form.cleaned_data[__success_field_name] is False:  # TODO - ensure correct
+                case = __extract_case_data(form)
+                add_contact(case)
             return HttpResponseRedirect('/tracers')
         else:
             return HttpResponseRedirect('/tracers/error')
