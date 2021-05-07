@@ -105,8 +105,11 @@ def retrieve_contact():
     return rp.retrieve_person(IN_CONTACT, chan, con)
 
 
+# initially, this used a callback function to write to the instance variable
+# however, this can be accomplished much better through use of basic_get
+# the class remains, and can probably be refactored to remove the class
+# the class is only instantiated in retrieve_pos_case and retrieve_contact
 class RetrievePerson:
-    __response = None
 
     @staticmethod
     def __date_time_decoder(xs):
@@ -120,31 +123,25 @@ class RetrievePerson:
 
     def retrieve_person(self, chan_name, chan, con):
 
-        def callback(ch, method, properties, body):
+        """def callback(ch, method, properties, body):
             print('received %r' % body)
             self.__response = json.loads(body, object_hook=self.__date_time_decoder)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
+            ch.basic_ack(delivery_tag=method.delivery_tag)"""
 
         # chan, con = __setup(chan_name)
 
-        chan.basic_qos(prefetch_count=1)
-        chan.basic_consume(queue=chan_name, on_message_callback=callback, exclusive=True)
-        chan.start_consuming()
+        status = chan.queue_declare(queue=chan_name, durable=True)
 
-        # with these figures, it checks the queue 20 times (once per millisecond) for a total of 20ms then continues
-        # this parameter may need to be made longer to allow for more checks
-        count = 0
-        max = 4
-        interval = 0.05  # 0.01s
-
-        while self.__response is None and count < max:
-            count += 1
-            import time
-            time.sleep(interval)
+        # we only attempt to retrieve a message if there is a message not awaiting an acknowledgment
+        if status.method.message_count > 0:
+            method, head, response = chan.basic_get(queue=chan_name)
+            chan.basic_ack(delivery_tag=method.delivery_tag)
+        else:
+            response = None
 
         con.close()
 
-        return self.__response
+        return response
 
 
 if __name__ == '__main__':
