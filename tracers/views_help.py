@@ -68,16 +68,19 @@ def __get_contact(cd: dict):  # cd = contact data
 def next_contact():
     import tracer_queues
     next_details = tracer_queues.retrieve_contact()
-    try:
-        with transaction.atomic():
-            now = datetime.datetime.now(timezone.utc)
-            contact = __get_contact(next_details)
-            # contact = contacts_needing_contacting().first()
-            if contact is not None:
-                contact.being_contacted = True
-                contact.contact_start = now
-                contact.save()
-    except Contact.DoesNotExist:
+    if next_details is not None:
+        try:
+            with transaction.atomic():
+                now = datetime.datetime.now(timezone.utc)
+                contact = __get_contact(next_details)
+                # contact = contacts_needing_contacting().first()
+                if contact is not None:
+                    contact.being_contacted = True
+                    contact.contact_start = now
+                    contact.save()
+        except Contact.DoesNotExist:
+            contact = None
+    else:
         contact = None
     return contact
 
