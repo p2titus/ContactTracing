@@ -3,7 +3,13 @@ from django.shortcuts import render
 from django.views import generic
 from . import views_help
 from .forms import *
-from tracer_queues import add_contact, add_poscase
+from tracer_queues import add_poscase
+
+
+# avoiding duplicate names of functions
+def add_contact_to_queue(contact: dict):
+    import tracer_queues
+    tracer_queues.add_contact(contact)
 
 
 def index(request):
@@ -44,8 +50,8 @@ def add_contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            case = __extract_case_data(form)
-            add_contact(case)
+            case = __extract_contact_data(form)
+            add_contact_to_queue(case)
             form.add_contact()
             return HttpResponse('<script type="text/javascript">window.close()</script>')
         else:
@@ -54,10 +60,11 @@ def add_contact(request):
         return HttpResponseRedirect('/tracers')
 
 
-# duplicate of same named function found in testingCentre/views
+# duplicate of same named function found in testingCentre/views with small changes made
 def __extract_case_data(form):
     x = None
-    if form.cleaned_data['result'] is True:
+    res_field = 'result'  # result field
+    if res_field not in form or form.cleaned_data[res_field] is True:
         x = {
             'name': form.cleaned_data['name'],
             'phone_num': form.cleaned_data['phone_num'],
@@ -66,6 +73,16 @@ def __extract_case_data(form):
             'test_date': form.cleaned_data['test_date']
         }
     return x
+
+
+def __extract_contact_data(form):
+    return {
+        'name': form.cleaned_data['contact_name'],
+        'phone_num': form.cleaned_data['contact_phone_num'],
+        'postcode': form.cleaned_data['postcode'],
+        'address': form.cleaned_data['place_of_contact'],
+        'email': form.cleaned_data['contact_email']
+    }
 
 
 # used to query whether a contact has been reached or not
