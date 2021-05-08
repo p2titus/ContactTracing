@@ -135,13 +135,16 @@ class RetrievePerson:
         # we only attempt to retrieve a message if there is a message not awaiting an acknowledgment
         if status.method.message_count > 0:
             method, head, response = chan.basic_get(queue=chan_name)
+            decoded = response.decode('utf-8')
+            person = json.loads(decoded, object_hook=self.__date_time_decoder)
             chan.basic_ack(delivery_tag=method.delivery_tag)
+        # if we cannot find a message, we simply return None
         else:
-            response = None
+            person = None
 
         con.close()
 
-        return response
+        return person
 
 
 if __name__ == '__main__':
