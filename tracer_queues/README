@@ -1,41 +1,26 @@
-an implementation of a rabbitmq server
-used to keep a distributed queue of positive cases to be contact traced
-also keeps contacts to be traced
+the tracer_queues directory is dedicated to providing access to rabbitmq
 
-the queue will be as resilient to failure as possible
-in the event of a failure, there should be some recovery protocol
+rabbitmq is used primarily to provide a distributed queue of cases and contacts
+to be contacted. whenever a test or a contact is input into the system, it is
+saved to the database and pushed to rabbitmq. tracers will then retrieve these
+via calls to the queue. this removes all race hazards on the database by
+relying on rabbitmq to output each case at most once.
 
-this collection of code does not necessarily have to be run on the same server
-as the website, but it must be run and configured correctly to allow django to
-function as required
+this implementation has a few requirements:
+- an instance of rabbitmq-server must already be running on the node (a basic
+startup script is left over from earlier in development)
+- parameters in main.py must be configured correctly
+- relevant queues must be created. this can be done by running 
+tracer_queues/main.py independently of the website
 
-the idea at the moment is to use an RPC like pattern (as detailed at 
-https://en.wikipedia.org/wiki/Remote_procedure_call - the idea is that 
-computation is performed in a different address space) but with the contact
-tracers and their 'tracing' forming the remote computation.
-
-for now, we are doing a simple implementation where creation of a user adds it
-to the queue, and tracing retrieves them
-
-this will need to be augmented with:
-returning contacts to the queue if they haven't been confirmed in a period of
-time/aren't able to be reached
-publisher confirms (to ensure that all contacts are written successfully)
-some mechanism for synchronising different database instances so that
-statistics can be run correctly on any given web server
-
-
----
-
-TODO
-When adding users to the system, PUSH them to an exchange that will allow all
-copies of the webserver to write them to local storage
-
-When a case is POSITIVE, PUSH them to a central queue of some kind - this queue
-must act as a singleton under concurrent access
-
-Same must apply to contacts
-
-Updates and deletions to database entries must be dealt with in the same way as
-adding users to the system
+additionally, there is some additional setup required:
+- this version of rabbitmq currently operates using localhost. likely other
+servers will be configured and as such, this class may require rewrites. all
+rabbitmq specific functionality is confined to tracer_queues/main.py so changes
+should only be local to there
+- currently, a distributed database is required. there may be a better solution
+not involving one but this was beyond the scope of our project
+- the implementation of the tracers section of the website still locks and
+writes to databases whenever a contact is accessed. tying in with the previous
+point, it may be possible to skip this again.
 
