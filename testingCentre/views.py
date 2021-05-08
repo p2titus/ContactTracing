@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponseRedirect, HttpResponse
+import json
 
-from .forms import SingleTestForm
+from .forms import SingleTestForm, MultipleTestsForm
 
 # Create your views here.
 class LoginView(generic.TemplateView):
@@ -11,11 +12,25 @@ class LoginView(generic.TemplateView):
 class ChooseInputMethodView(generic.TemplateView):
     template_name = "testingCentre/chooseInputMethod.html"
 
-class InputCSVView(generic.TemplateView):
-    template_name = "testingCentre/csv.html"
+class InputMultipleTestsView(generic.FormView):
+    template_name = "testingCentre/multipleTests.html"
+    form_class = MultipleTestsForm
+    success_url = "/testingCentre/multipleTests/thanks"
 
-def thanks(request):
-    return HttpResponse("Result Entered")
+    def form_valid(self, form):
+        try:
+            data = json.load(form.cleaned_data['tests_file'])
+            form.check_data(data)
+        except:
+            return HttpResponseRedirect('/testingCentre/multipleTests/error')
+        form.add_tests(data)
+        return super().form_valid(form)
+
+class DataFormatErrorView(generic.TemplateView):
+    template_name = "testingCentre/error.html"
+
+class ResultEnteredView(generic.TemplateView):
+    template_name = "testingCentre/thanks.html"
 
 def add_person(request):
     if request.method == 'POST':

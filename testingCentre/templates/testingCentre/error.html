@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enter JSON</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'testingCentre:chooseInputMethod' %}" style="color:white">
+        Contact Tracing Testing Centres Portal
+      </a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="row my-5">
+      <div class="col d-flex justify-content-center">
+        <h2>Error: Incorrect Data Schema</h2>
+      </div>
+    </div>
+    
+    <div class="row my-5">
+      <div class="col d-flex justify-content-center">
+        <p style="font-size:13px">
+          Please use JSON code that conforms to the schema in the following example:<br><br>
+          [<br>
+              {<br>
+                  "name": "name of person 1",<br>
+                  "date of birth":"dd/mm/yy",<br>
+                  "phone":"phone number of person 1",<br>
+                  "email":"email address of person 1",<br>
+                  "address":"address of person 1",<br>
+                  "postcode":"postcode of person 1's address",<br>
+                  "test date":"dd/mm/yy",<br>
+                  "test result":true<br>
+              },<br><br>
+              {<br>
+                  "name": "name of person 2",<br>
+                  "date of birth":"dd/mm/yy",<br>
+                  "phone":"phone number of person 2",<br>
+                  "email":"email address of person 2",<br>
+                  "address":"address of person 2",<br>
+                  "postcode":"postcode of person 2's address",<br>
+                  "test date":"dd/mm/yy",<br>
+                  "test result":false<br>
+              }<br>
+          ]<br><br>
+          Note:<br>
+              1. The JSON code should consist of an array of objects, each corresponding to a test.<br>
+              2. The value for "test result" should be true if the result is positive, and false otherwise.<br>
+              3. The date of birth for any person and the date of any test must be within the last 150 years.<br>
+              4. Valid email addresses must be used.
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <form>
+          <div class="d-grid gap-2 col-4 mx-auto">
+            <button class="btn btn-dark btn-lg" style="font-size:25px; height:60px" type="submit" formaction="{% url 'testingCentre:multipleTests' %}">Upload another file</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
