@@ -9,7 +9,7 @@
 <body>
   <nav class="navbar navbar-expand-lg bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'testingCentre:chooseInputMethod' %}" style="color:white">
+      <a class="navbar-brand" href="{% url 'testingCentre:chooseInputMethod' %}" name="brand" style="color:white">
         Contact Tracing Testing Centres Portal
       </a>
     </div>
@@ -62,7 +62,7 @@
       <div class="col">
         <form>
           <div class="d-grid gap-2 col-4 mx-auto">
-            <button class="btn btn-dark btn-lg" style="font-size:25px; height:60px" type="submit" formaction="{% url 'testingCentre:multipleTests' %}">Upload another file</button>
+            <button class="btn btn-dark btn-lg" style="font-size:25px; height:60px" name="return" type="submit" formaction="{% url 'testingCentre:multipleTests' %}">Upload another file</button>
           </div>
         </form>
       </div>

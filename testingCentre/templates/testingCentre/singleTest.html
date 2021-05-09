@@ -9,7 +9,7 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'testingCentre:chooseInputMethod' %}" style="color:white">
+    <a class="navbar-brand" href="{% url 'testingCentre:chooseInputMethod' %}" name="brand" style="color:white">
       Contact Tracing Testing Centres Portal
     </a>
   </div>
@@ -27,7 +27,7 @@
       <form action="addPerson/" method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <input type="submit" value="Submit">
+          <input type="submit" name="submit" value="Submit">
       </form>
     </div>
   </div>

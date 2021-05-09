@@ -9,7 +9,7 @@
 <body>
   <nav class="navbar navbar-expand-lg bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#" style="color:white">
+      <a class="navbar-brand" href="#" name="brand" style="color:white">
         Contact Tracing Testing Centres Portal
       </a>
     </div>
@@ -24,9 +24,9 @@
     
     <div class="row">
       <div class="col">
-        <form>
+        <form action="{% url 'testingCentre:singleTest' %}">
           <div class="d-grid gap-2 col-6 mx-auto">
-            <button class="btn btn-dark btn-lg" style="font-size:25px; height:60px" type="submit" formaction="{% url 'testingCentre:singleTest' %}">Input a single test</button>
+            <button class="btn btn-dark btn-lg" name="single_test_button" style="font-size:25px; height:60px" type="submit">Input a single test</button>
           </div>
         </form>
       </div>
@@ -34,9 +34,9 @@
     
     <div class="row pt-4">
       <div class="col">
-        <form>
+        <form action="{% url 'testingCentre:multipleTests' %}">
           <div class="d-grid gap-2 col-6 mx-auto">
-            <button class="btn btn-dark btn-lg" style="font-size:25px; height:60px" type="submit" formaction="{% url 'testingCentre:multipleTests' %}">Input a JSON file</button>
+            <button class="btn btn-dark btn-lg" name="multiple_tests_button" style="font-size:25px; height:60px" type="submit">Input a JSON file</button>
           </div>
         </form>
       </div>
