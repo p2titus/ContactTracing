@@ -2,6 +2,7 @@ from django import forms
 from shared.models import People, Addresses, Test
 from django.core.validators import validate_email
 import datetime
+from django.utils import timezone
 
 # will run into problems if people start living more than 150 years
 current_year = datetime.datetime.today().year
@@ -87,19 +88,19 @@ class MultipleTestsForm(forms.Form):
         for test_dict in data:            
             assert(type(test_dict) is dict)
             assert(type(test_dict['name']) is str and len(test_dict['name']) <= max_name_len)
-            assert(datetime.datetime.strptime(test_dict['date of birth'], self.date_format).date().year in possible_years)
+            assert(datetime.datetime.strptime(test_dict['date of birth'], self.date_format).year in possible_years)
             assert(type(test_dict['phone']) is str and len(test_dict['phone']) <= max_phone_len)
             validate_email(test_dict['email'])
             assert(type(test_dict['address']) is str and len(test_dict['address']) <= max_addr_len)
             assert(type(test_dict['postcode']) is str and len(test_dict['postcode']) <= max_post_len)
-            assert(datetime.datetime.strptime(test_dict['test date'], self.date_format).date().year in possible_years)
+            assert(datetime.datetime.strptime(test_dict['test date'], self.date_format).year in possible_years)
             assert(type(test_dict['test result']) is bool)
 
     # convert the data to the corresponding model objects and save them
     def add_tests(self, data):
         for test_dict in data:
             date_of_birth = datetime.datetime.strptime(test_dict['date of birth'], self.date_format).date()
-            test_date = datetime.datetime.strptime(test_dict['test date'], self.date_format).date()
+            test_date = timezone.get_default_timezone().localize(datetime.datetime.strptime(test_dict['test date'], self.date_format))
             
             existing_address = Addresses.objects.filter(addr__exact=test_dict['address'],
                                                         postcode__exact=test_dict['postcode'])
