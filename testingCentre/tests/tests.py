@@ -114,8 +114,7 @@ class NavigationBarTests(SuperLiveServerTestCase):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse(from_url))
         self.selenium.find_element_by_name("brand").click()
-        target_url = self.live_server_url+reverse('testingCentre:chooseInputMethod')
-        assert(self.selenium.current_url==target_url or self.selenium.current_url==target_url+"#")
+        assert(self.selenium.current_url==self.live_server_url+reverse('testingCentre:chooseInputMethod'))
 
     def test_choose_input_method_view_navigation_bar(self):
         self.click_brand_link_and_return_to_homepage_from("testingCentre:chooseInputMethod")
@@ -138,7 +137,6 @@ class NavigationBarTests(SuperLiveServerTestCase):
 class LoginSystemTests(SuperLiveServerTestCase):
 
     def cannot_visit_sites(self):
-        #from django.urls import reverse
         self.selenium.get(self.live_server_url+reverse('testingCentre:chooseInputMethod'))
         assert(self.selenium.find_element_by_name("message").text == "You are not logged in")
         self.selenium.get(self.live_server_url+reverse('testingCentre:singleTest'))
