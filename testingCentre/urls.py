@@ -1,10 +1,8 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'testingCentre'
 urlpatterns = [
-    # ex: /testingCentre/
-    path('', views.LoginView.as_view(), name='login'),
     # ex: /testingCentre/choose/
     path('choose/', views.ChooseInputMethodView.as_view(), name='chooseInputMethod'),
     # ex: /testingCentre/multipleTests/
@@ -19,6 +17,9 @@ urlpatterns = [
     path('singleTest/thanks/', views.ResultEnteredView.as_view(), name='thanks'),
     # /testingCentre/singleTest/addPerson
     path('singleTest/addPerson/', views.add_person, name='add person'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/login/logged_in/', views.loggedIn, name='logged_in'),
+    path('accounts/logout/logout', views.logout, name='logout'),
 
     # path('singleTest/enterResult/', views.thanks, name='thanks'),
 
