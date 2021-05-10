@@ -24,7 +24,7 @@ class SuperLiveServerTestCase(LiveServerTestCase):
         username = "terry"
         password = "yrret"
         User.objects.create_user(username=username, password=password)
-        self.selenium.get(self.live_server_url+"/testingCentre/accounts/login/")
+        self.selenium.get(self.live_server_url+reverse('testingCentre:login'))
         self.selenium.find_element_by_name("username").send_keys(username)
         self.selenium.find_element_by_name("password").send_keys(password)
         self.selenium.find_element_by_name("submit").click()
@@ -156,11 +156,11 @@ class LoginSystemTests(SuperLiveServerTestCase):
         self.cannot_visit_sites()
 
     def test_login_with_wrong_username_and_password(self):
-        self.selenium.get(self.live_server_url+"/testingCentre/accounts/login/")
+        self.selenium.get(self.live_server_url+reverse('testingCentre:login'))
         self.selenium.find_element_by_name("username").send_keys("terry")
         self.selenium.find_element_by_name("password").send_keys("yrret")
         self.selenium.find_element_by_name("submit").click()
-        assert(self.selenium.current_url == self.live_server_url+"/testingCentre/accounts/login/")
+        assert(self.selenium.current_url == self.live_server_url+reverse('testingCentre:login'))
 
     def test_logout(self):
         self.create_user_and_login()
