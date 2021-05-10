@@ -6,9 +6,9 @@
 {% block content %}
 {% if user.is_authenticated %}
     {% block page %} {%  endblock %}
-    <p><a href="{% url 'testingCentre:logout' %}">Log out</a></p>
+    <p><a name="logout" href="{% url 'testingCentre:logout' %}">Log out</a></p>
 {% else %}
-    <p>You are not logged in</p>
+    <p name="message">You are not logged in</p>
     <a href="{% url 'testingCentre:login' %}">Log In</a>
 {% endif %}
 {% endblock %}
