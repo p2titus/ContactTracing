@@ -2,15 +2,10 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.utils import LayerMapping
 from django.core.management.base import BaseCommand
 from openpyxl import load_workbook
+from ContactTracing.settings import POPULATION_XLSX_FILE, AREA_FILES_AND_CODES
 
 from government.models import Area
 
-to_load = [("./government/areas/1countries/Countries_(December_2019)_Boundaries_UK_BUC.shp", Area.COUNTRY, "ctry19nm"),
-           ("./government/areas/2regions/Regions_(December_2019)_Boundaries_EN_BUC.shp", Area.REGION, "rgn19nm"),
-           ("./government/areas/3counties/Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BUC.shp",
-            Area.COUNTY, "ctyua19nm"),
-           ("./government/areas/4local_authority_districts/Local_Authority_Districts_(December_2020)_UK_BUC.shp",
-            Area.LA, "LAD20NM")]
 
 
 class CustomLayerMapping(LayerMapping):
@@ -34,8 +29,8 @@ class Command(BaseCommand):
 
         if options["shps"]:
             # ignores all options/args
-            for (file, t, name_field) in to_load:
-                self.stdout.write(" %s, %s, %s" % (file, t, name_field))
+            for (t, file, name_field) in AREA_FILES_AND_CODES:
+
                 ds = DataSource(file)
                 layer = ds[0]
                 mapping = {
@@ -43,12 +38,17 @@ class Command(BaseCommand):
                     "name": name_field,
 
                 }
-                lm = CustomLayerMapping(model=Area, data=ds, mapping=mapping, custom={"type": t})
+                types = {
+                    "country": Area.COUNTRY,
+                    "region": Area.REGION,
+                    "county": Area.COUNTY,
+                    "la": Area.LA
+                }
+                lm = CustomLayerMapping(model=Area, data=ds, mapping=mapping, custom={"type":  types[t]})
                 lm.save(verbose=False, strict=True)
 
         elif options["pops"]:
-            wb = load_workbook(
-                filename='/home/max/code/ContactTracing/government/ukmidyearestimates20192020ladcodes.xlsx')
+            wb = load_workbook(filename=POPULATION_XLSX_FILE)
             sheet = wb["MYE2 - Persons"]
             data = sheet["B6": "D431"]
 

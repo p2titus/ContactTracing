@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'c6elsbpfnfy-3=i_jquh)k#x)42%)pgikum+16$cuw3^&jgccr'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -77,7 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ContactTracing.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -91,7 +88,6 @@ DATABASES = {
         'HOST': 'localhost'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -111,7 +107,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -125,7 +120,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
@@ -136,3 +130,18 @@ LOGOUT_REDIRECT_URL = 'logout/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# Mapping data:
+
+
+POPULATION_XLSX_FILE = './government/data/ukmidyearestimates20192020ladcodes.xlsx'
+
+# the first part is the type of area, the second the path to the .shp file, and the last the name of the field
+# for the area's name
+AREA_FILES_AND_CODES = [
+    ("country", "./government/data/1countries/Countries_(December_2019)_Boundaries_UK_BUC.shp", "ctry19nm"),
+    ("region", "./government/data/2regions/Regions_(December_2019)_Boundaries_EN_BUC.shp", "rgn19nm"),
+    ("county", "./government/data/3counties/Counties_and_Unitary_Authorities_(December_2019)_Boundaries_UK_BUC.shp",
+     "ctyua19nm"),
+    ("la", "./government/data/4local_authority_districts/Local_Authority_Districts_(December_2020)_UK_BUC.shp",
+     "LAD20NM")]
