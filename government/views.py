@@ -65,15 +65,19 @@ def get_time_statistics(time_frame, offset):
     # by this point, age_groups is a list of the dates today, 10 years ago... up to 80 years ago
     age_test_data = []
     for i in range(0, 8, 1):
-        birthday0 = age_groups[i] ; birthday1 = age_groups[i+1]
-        age_test_data.append(test_objects.filter(person__date_of_birth__lte=birthday0).filter(person__date_of_birth__gt=birthday1).count()) #i.e. their birthday is in the 10 year window from birthday0 to birthday1
+        birthday0 = age_groups[i]
+        birthday1 = age_groups[i + 1]
+        age_test_data.append(test_objects.filter(person__date_of_birth__lte=birthday0).filter(
+            person__date_of_birth__gt=birthday1).count())  # i.e. their birthday is in the 10 year window from birthday0 to birthday1
     age_test_data.append(test_objects.filter(person__date_of_birth__lte=age_groups[8]).count())
 
     age_pos_data = []
     for i in range(0, 8, 1):
-        birthday0 = age_groups[i] ; birthday1 = age_groups[i+1]
-        age_pos_data.append(pos_tests.filter(person__date_of_birth__gt=birthday1).filter(person__date_of_birth__lte=birthday0).count())
-    age_pos_data.append(pos_tests.filter(person__date_of_birth__lte=age_groups[8]))
+        birthday0 = age_groups[i]
+        birthday1 = age_groups[i + 1]
+        age_pos_data.append(
+            pos_tests.filter(person__date_of_birth__gt=birthday1).filter(person__date_of_birth__lte=birthday0).count())
+    age_pos_data.append(pos_tests.filter(person__date_of_birth__lte=age_groups[8]).count())
 
     # age_pos_data is now a list of size 9 with the number of positive cases for people in each age group
 
@@ -90,8 +94,11 @@ def get_time_statistics(time_frame, offset):
     contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(
         date_contacted__lte=time_threshold_1).count()
 
-    tests_by_day = test_objects.annotate(day = TruncDate("test_date")).values("day").order_by("day").annotate(count=Count("id")).values("day", "count")
-    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(count=Count("id")).values(
+    tests_by_day = test_objects.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(
+        count=Count("id")).values(
+        "day", "count")
+    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(
+        count=Count("id")).values(
         "day", "count")
     rate_by_day = []
     for (pos, tests) in zip(pos_by_day, tests_by_day):
