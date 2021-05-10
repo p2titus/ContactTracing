@@ -186,7 +186,7 @@
                                 <tr>
                                     <th scope="row">{{ area.name }}</th>
                                     <td>{{ area.alltime_count }}</td>
-                                    <td>Data unavailable</td>
+                                    <td>{% if area.population == 0 %} Data unavailable {% else %} {{ area.alltime_count|per:area.population|floatformat:2 }} {% endif %} </td>
                                 </tr>
 
                             {% endfor %}
@@ -210,7 +210,7 @@
             <p>In {{ time_description }}, </p>
             <ul class="datapoints-list">
                 <!-- TODO: make indicators real -->
-                <li><span class="number-highlight">Unknown{# { cases_contacted|floatformat:2 }} #}%</span> of positive
+                <li><span class="number-highlight">{{ cases_contacted|floatformat:2 }}%</span> of positive
                     cases were contacted by tracers
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if cases_contacted >= prev_cases_contacted %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_cases_contacted|floatformat:2 }} to {{ cases_contacted|floatformat:2 }}"
@@ -467,7 +467,7 @@
             //click: zoomToFeature
         });
         if (feature.properties) {
-            layer.bindPopup(`Cases in cluster: ${feature.properties.points_in_cluster}\nCluster id: ${feature.properties.cluster_id}`);
+            layer.bindPopup(`Cases in cluster: ${feature.properties.cluster_size}`);
         }
     }
     let json = L.geoJson(cluster_data, {
@@ -482,7 +482,7 @@
     {% for _, var_name,data in areas %}
         {
             const geojson_data =
-                {{ data|geojsonfeature:"name,id,type,alltime_count:poly"|safe }};
+                {{ data|geojsonfeature:"name,id,type,cluster_size:poly"|safe }};
 
 
             let map = L.map("{{ var_name }}-map").setView(default_centre, default_zoom)

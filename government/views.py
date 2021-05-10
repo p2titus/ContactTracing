@@ -20,7 +20,7 @@ def get_geographic_data(start_day):
     # Should be fine to use raw SQL as we aren't using user input
     geos_point_type = connection.ops.select % "poly"  # poly is the name of the field in Area
     areas_with_alltime_counts = Area.objects.raw("""
-        select ga.id, ga.poly::bytea as poly, ga.type, ga.name, count(test) as alltime_count
+        select ga.id, ga.poly::bytea as poly, ga.type, ga.name, ga.population, count(test) as alltime_count
             from shared_test as test
                 join shared_people sp on test.person_id = sp.id
                 join shared_addresses sa on sa.id = sp.location_id

@@ -1,12 +1,13 @@
+from django.contrib.gis.db.models.functions import PointOnSurface
+from django.contrib.gis.geos import Point
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 import random
 
 from django.core.management.base import BaseCommand
 from shared.models import Test, Addresses, People, Contact
 from government.models import Area
-from django.contrib.gis.geos import Point
-from django.contrib.gis.db.models.functions import PointOnSurface
+
 from government.hooks.dbscan import cluster
 
 UK_eastings_range = [3530514.28, 3570579.82]

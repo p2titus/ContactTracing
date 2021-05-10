@@ -19,6 +19,7 @@ class Area(models.Model):
     )
     name = models.CharField(max_length=256)
     poly = models.MultiPolygonField(srid=3035)
+    population = models.IntegerField()
     type = models.CharField(max_length=4, choices=AREA_TYPES, default=LA)
 
 
