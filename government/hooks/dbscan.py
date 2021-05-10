@@ -1,15 +1,11 @@
 import uuid
 
 from django.contrib.gis.measure import D
+from django.db import connection
 from django.db.models import Min, Max
 
 from government.models import Cluster
 from shared.models import Contact
-from government.models import Cluster
-from django.contrib.gis.measure import D
-from django.db import connection
-
-import uuid
 
 # TODO: find suitable values
 EPS = 500  # metres
@@ -18,8 +14,8 @@ MIN_PTS = 4
 NOISE = "Noise"
 
 
-def __get_neighbours(point, excl=[]):
-    return Contact.objects.filter(location__point__distance_lte=(point, D(m=EPS))).exclude(id__in=excl)
+def __get_neighbours(point):
+    return Contact.objects.filter(location__point__distance_lte=(point, D(m=EPS)))
 
 
 def __find_cluster(contact, ignore_seen=True):

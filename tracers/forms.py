@@ -1,4 +1,6 @@
 from django import forms
+
+from government.hooks.dbscan import cluster
 from shared.models import *
 
 class Form(forms.Form):
@@ -69,6 +71,7 @@ class ContactForm(forms.Form):
             location = Addresses.objects.get(pk=location)
         )
         t.save()
+        cluster(t)
 
 
     def add_contact(self):
