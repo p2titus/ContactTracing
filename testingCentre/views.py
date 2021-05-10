@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth import logout as user_logout
 import json
 
 from .forms import SingleTestForm, MultipleTestsForm
@@ -10,6 +11,7 @@ def loggedIn(request):
     return HttpResponseRedirect("/testingCentre/choose")
 
 def logout(request):
+    user_logout(request)
     return HttpResponseRedirect("/testingCentre/accounts/login")
 
 class ChooseInputMethodView(generic.TemplateView):
