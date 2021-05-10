@@ -1,0 +1,31 @@
+<!-- templates/singleTest.html -->
+{% extends 'testingCentre/login.html' %}
+
+{% block header %}
+    <meta http-equiv="refresh" content="3;url={% url 'testingCentre:chooseInputMethod' %}"/>
+    <title>Result entered</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+{% endblock %}
+
+{% block page %}
+  <nav class="navbar navbar-expand-lg bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'testingCentre:chooseInputMethod' %}" style="color:white">
+        Contact Tracing Testing Centres Portal
+      </a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row mt-5">
+      <div class="col d-flex justify-content-center">
+        <h2>Result entered. Thank you!</h2>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col d-flex justify-content-center">
+        <h4>Page will redirect shortly.</h4>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -90,8 +90,8 @@ def get_time_description(time_frame, prev=False):
 
 
 def get_time_statistics(time_frame, offset):
-    # i.e. say we want the aggregate data over a week, 4 weeks ago, we would call gts(7,3). zero indexed, i.e. gts(7,
-    # 0) is the most recent week of stats
+    # i.e. say we want the aggregate data over a week, 4 weeks ago, we would call gts(7,3). zero indexed, i.e. gts(7,0)
+    # is the most recent week of stats
     time_threshold_0 = timezone.now() - timedelta(days=time_frame * (offset + 1))
     time_threshold_1 = timezone.now() - timedelta(days=offset * time_frame)
     test_objects = Test.objects.filter(test_date__gt=time_threshold_0).filter(test_date__lte=time_threshold_1)
@@ -111,20 +111,16 @@ def get_time_statistics(time_frame, offset):
         age_groups.append(birthday)
     # by this point, age_groups is a list of the dates today, 10 years ago... up to 80 years ago
     age_test_data = []
-    for i in range(0, 9, 1):
-        birthday = age_groups[i]
-        age_test_data.append(test_objects.filter(person__date_of_birth__gte=birthday).count())
-
     for i in range(0, 8, 1):
-        age_test_data[i + 1] -= age_test_data[i]
-    # age_data is now a list of size 9 with the number of people in the ages 0-9,10-19.. 80+ who have been tested
+        birthday0 = age_groups[i] ; birthday1 = age_groups[i+1]
+        age_test_data.append(test_objects.filter(person__date_of_birth__lte=birthday0).filter(person__date_of_birth__gt=birthday1).count()) #i.e. their birthday is in the 10 year window from birthday0 to birthday1
+    age_test_data.append(test_objects.filter(person__date_of_birth__lte=age_groups[8]).count())
+
     age_pos_data = []
-
-    for i in range(0, 9, 1):
-        birthday = age_groups[i]
-        age_pos_data.append(pos_tests.filter(person__date_of_birth__gte=birthday).count())
     for i in range(0, 8, 1):
-        age_pos_data[i + 1] -= age_pos_data[i]
+        birthday0 = age_groups[i] ; birthday1 = age_groups[i+1]
+        age_pos_data.append(pos_tests.filter(person__date_of_birth__gt=birthday1).filter(person__date_of_birth__lte=birthday0).count())
+    age_pos_data.append(pos_tests.filter(person__date_of_birth__lte=age_groups[8]))
 
     # age_pos_data is now a list of size 9 with the number of positive cases for people in each age group
 

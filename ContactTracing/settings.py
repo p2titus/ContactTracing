@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'shared.apps.SharedConfig',
     'government.apps.GovernmentConfig',
+    'testingCentre.apps.TestingCentreConfig',
     'tracers.apps.TracersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -129,6 +130,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+LOGIN_REDIRECT_URL = 'logged_in/'
+LOGOUT_REDIRECT_URL = 'logout/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",

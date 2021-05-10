@@ -25,7 +25,11 @@ urlpatterns = [
                   # Government site URLs:
                   path('govt/', include("government.urls")),
 
+                  # testing centre URLS:
+                  path('testingCentre/', include("testingCentre.urls")),
+
                   # Tracer site URLs:
                   path('tracers/', include("tracers.urls")),
+
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # TODO: remove before production

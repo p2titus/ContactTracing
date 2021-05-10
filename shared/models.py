@@ -3,6 +3,7 @@ from django.contrib.gis.geos import Point
 from django.db import transaction
 import datetime
 
+
 """
 The basic models used by the application
 This automatically generates the relevant tables, completely removing any need for raw SQL
@@ -51,20 +52,6 @@ class Test(models.Model):
     def get_uncontacted():
         xs = TestContacted.objects.all()
         return Test.objects.exclude(pk__in=xs.values_list('case', flat=True))
-
-    # claims & returns earliest positive test that hasn't been claimed
-    @staticmethod
-    def get_next():
-        try:
-            with transaction.atomic():
-                test = Test.objects.exclude(being_contacted__exact=True).exclude(
-                    person__in=TestContacted.objects.values_list('case', flat=True)
-                ).filter(result__exact=True).earliest('test_date')
-                test.being_contacted = True
-                test.save()
-        except Test.DoesNotExist:
-            test = None
-        return test
 
 
 class Contact(models.Model):

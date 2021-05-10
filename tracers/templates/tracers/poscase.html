@@ -1,10 +1,29 @@
 {%load static%}
 <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+
+<p><form action="/tracers/poscase" type="POST">
+    <input type="submit" value="New Case" />
+</form></p>
+
 {% if success %}
     <p>Person who has tested positive</p>
-    {{name}}
-    {{phone}}
-    {{date}}
+    <p>NAME: {{name}}</p>
+    <p>PHONE: {{phone}}</p>
+    <p>DATE: {{date}}</p>
+
+    <form action="/tracers/add_contact/", target="_blank" method="post">
+    {% csrf_token %}
+    {{ form_addcontact }}
+    <input type="submit" value="Add Contact">
+    </form>
+
+    <p>Have you successfully reached this person?</p>
+    <form action="/tracers/add_testcontacted/", method="post">
+    {% csrf_token %}
+    {{ form_confirm }}
+    <input type="submit" value="Done">
+    </form>
 {% else %}
     {{error}}
 {% endif %}
+
