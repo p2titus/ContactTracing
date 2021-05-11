@@ -14,6 +14,7 @@ class SuperLiveServerTestCase(LiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.selenium = WebDriver(executable_path=os.getcwd()+"/testingCentre/tests/chromedriver")
+        cls.selenium.implicitly_wait(10)
 
     @classmethod
     def tearDownClass(cls):
