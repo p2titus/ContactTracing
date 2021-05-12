@@ -1,4 +1,5 @@
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
 from shared.models import Addresses, People, Test
 from django.contrib.auth.models import User
@@ -28,20 +29,20 @@ class SuperLiveServerTestCase(LiveServerTestCase):
         self.selenium.get(self.live_server_url+reverse('testingCentre:login'))
         self.selenium.find_element_by_name("username").send_keys(username)
         self.selenium.find_element_by_name("password").send_keys(password)
-        self.selenium.find_element_by_name("submit").click()
+        self.selenium.find_element_by_name("submit").send_keys(Keys.RETURN)
 
 class ChooseInputMethodViewTests(SuperLiveServerTestCase):
 
     def test_choose_single_test(self):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse('testingCentre:chooseInputMethod'))
-        self.selenium.find_element_by_name("single_test_button").click()
+        self.selenium.find_element_by_name("single_test_button").send_keys(Keys.RETURN)
         assert(self.selenium.current_url.startswith(self.live_server_url+reverse('testingCentre:singleTest')+"?single_test_button="))
 
     def test_choose_multiple_tests(self):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse('testingCentre:chooseInputMethod'))
-        self.selenium.find_element_by_name("multiple_tests_button").click()
+        self.selenium.find_element_by_name("multiple_tests_button").send_keys(Keys.RETURN)
         assert(self.selenium.current_url.startswith(self.live_server_url+reverse('testingCentre:multipleTests')+"?multiple_tests_button="))
 
 class InputSingleTestViewTests(SuperLiveServerTestCase):
@@ -54,7 +55,7 @@ class InputSingleTestViewTests(SuperLiveServerTestCase):
         self.selenium.find_element_by_name("email").send_keys('terrycheng2001@gmail.com')
         self.selenium.find_element_by_name("addr").send_keys('1 Linghu Avenue, Wuxi')
         self.selenium.find_element_by_name("postcode").send_keys('214000')
-        self.selenium.find_element_by_name("submit").click()
+        self.selenium.find_element_by_name("submit").send_keys(Keys.RETURN)
         assert(self.selenium.current_url == self.live_server_url+reverse('testingCentre:thanks'))
 
         assert(Addresses.objects.count() == 1)
@@ -71,7 +72,7 @@ class InputMultipleTestsViewTests(SuperLiveServerTestCase):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse('testingCentre:multipleTests'))
         self.selenium.find_element_by_name("tests_file").send_keys(os.getcwd()+"/testingCentre/tests/tests.json")
-        self.selenium.find_element_by_name("submit").click()
+        self.selenium.find_element_by_name("submit").send_keys(Keys.RETURN)
         assert(self.selenium.current_url == self.live_server_url+reverse('testingCentre:multipleTestsThanks'))
 
         addresses = Addresses.objects.all()
@@ -97,7 +98,7 @@ class InputMultipleTestsViewTests(SuperLiveServerTestCase):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse('testingCentre:multipleTests'))
         self.selenium.find_element_by_name("tests_file").send_keys(os.getcwd()+"/testingCentre/tests/testsWithInvalidEmail.json")
-        self.selenium.find_element_by_name("submit").click()
+        self.selenium.find_element_by_name("submit").send_keys(Keys.RETURN)
         assert(self.selenium.current_url == self.live_server_url+reverse('testingCentre:multipleTestsError'))
         assert(Addresses.objects.count() == 0)
 
@@ -106,7 +107,7 @@ class DataFormatErrorViewTests(SuperLiveServerTestCase):
     def test_upload_another_file(self):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse('testingCentre:multipleTestsError'))
-        self.selenium.find_element_by_name("return").click()
+        self.selenium.find_element_by_name("return").send_keys(Keys.RETURN)
         assert(self.selenium.current_url == self.live_server_url+reverse('testingCentre:multipleTests')+"?return=")
 
 class NavigationBarTests(SuperLiveServerTestCase):
@@ -114,7 +115,7 @@ class NavigationBarTests(SuperLiveServerTestCase):
     def click_brand_link_and_return_to_homepage_from(self, from_url):
         self.create_user_and_login()
         self.selenium.get(self.live_server_url+reverse(from_url))
-        self.selenium.find_element_by_name("brand").click()
+        self.selenium.find_element_by_name("brand").send_keys(Keys.RETURN)
         assert(self.selenium.current_url==self.live_server_url+reverse('testingCentre:chooseInputMethod'))
 
     def test_choose_input_method_view_navigation_bar(self):
@@ -158,10 +159,10 @@ class LoginSystemTests(SuperLiveServerTestCase):
         self.selenium.get(self.live_server_url+reverse('testingCentre:login'))
         self.selenium.find_element_by_name("username").send_keys("terry")
         self.selenium.find_element_by_name("password").send_keys("yrret")
-        self.selenium.find_element_by_name("submit").click()
+        self.selenium.find_element_by_name("submit").send_keys(Keys.RETURN)
         assert(self.selenium.current_url == self.live_server_url+reverse('testingCentre:login'))
 
     def test_logout(self):
         self.create_user_and_login()
-        self.selenium.find_element_by_name("logout").click()
+        self.selenium.find_element_by_name("logout").send_keys(Keys.RETURN)
         self.cannot_visit_sites()
