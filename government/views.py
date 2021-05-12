@@ -12,8 +12,8 @@ from government.models import Area, Cluster
 from shared.models import Test, ContactContacted
 
 
-def index(request):
-    return HttpResponse("Hello!")
+def home(request):
+    return  render(request, "government/root.html")
 
 
 def get_geographic_data(start_day):
