@@ -8,8 +8,8 @@ Requirements:
 - PostgreSQL - the version doesn't really matter but 12 or higher works
 - PostGIS extension for PostgreSQL, as well as the libraries that requires
     - on Ubuntu/Debian, use the ppa repository for PostgreSQL, which includes a package for PostGIS with all its requirements
-- RabbitMQ - further details about the requirements for this can be found in the README in the tracer_queues section of the project
-
+- RabbitMQ - further details about setup can be found in the README in the tracer_queues section of the project
+    - RabbitMQ server will be required - this can be installed via the default package managers for most common flavours of linux
 
 Data:
 - recent population data is included, in the `ukmidyearestimates20192020ladcodes.xlsx` file, which is sourced from the ONS, [here](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland). Note it needs to be converted to `.xlsx` first.
@@ -30,3 +30,4 @@ Database setup:
 
 ## Run
 `python manage.py runserver`, and run it behind a reverse proxy (that deals with HTTPS/etc.)
+Separately, `rabbitmq-server` with the required configuration will need to be run
