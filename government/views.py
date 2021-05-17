@@ -1,63 +1,16 @@
-from datetime import date, timedelta
-
-from django.db import connection
-from django.db.models import Count, Max, Avg
 from django.db.models.functions import TruncDate
-from django.http import HttpResponse
 from django.shortcuts import render
+from django.http import HttpResponse
+from django.db.models import Count, Max, Avg
 from django.utils import timezone
 
-from government.hooks.dbscan import MIN_PTS, EPS
-from government.models import Area, Cluster
 from shared.models import Test, ContactContacted
+from datetime import date, timedelta
+from government.hooks.dbscan import MIN_PTS, EPS
 
 
-def home(request):
-    return  render(request, "government/root.html")
-
-
-def get_geographic_data(start_day):
-    # Should be fine to use raw SQL as we aren't using user input
-    geos_point_type = connection.ops.select % "poly"  # poly is the name of the field in Area
-    areas_with_alltime_counts = Area.objects.raw("""
-        select ga.id, ga.poly::bytea as poly, ga.type, ga.name, ga.population, count(test) as alltime_count
-            from shared_test as test
-                join shared_people sp on test.person_id = sp.id
-                join shared_addresses sa on sa.id = sp.location_id
-                join government_area ga on st_intersects(sa.point, ga.poly)
-            where test.result = True and test.test_date>= %s
-group by ga.id;
-    """, [start_day])
-
-    countries = []
-    regions = []
-    counties = []
-    las = []
-    for area in areas_with_alltime_counts:
-        if area.type == Area.COUNTRY:
-            countries.append(area)
-        if area.type == Area.REGION:
-            regions.append(area)
-        if area.type == Area.COUNTY:
-            counties.append(area)
-        if area.type == Area.LA:
-            las.append(area)
-
-    # TODO: need to add timestamps to database
-
-    data = [
-        ("Nation", "country", countries),
-        ("Region (England only)", "region", regions),
-        ("County/Unitary Authority", "county", counties),
-        ("Local Authority District", "la", las)
-    ]
-
-    return data
-
-
-def clusters(time_frame):
-    data = Cluster.objects.filter(end_date__gte=time_frame)
-    return list(data)
+def index(request):
+    return HttpResponse("Hello, Government user!.")
 
 
 pretty_times = {
@@ -75,7 +28,7 @@ def get_time_description(time_frame, prev=False):
     else:
         if time_frame % 365 == 0:
             t = "the last %d years" % (time_frame // 365)
-        # elif time_frame % 30 == 0:
+        #elif time_frame % 30 == 0:
         #    t = "the last %d months" % (time_frame // 30)
         elif time_frame % 7 == 0:
             t = "the last %d weeks" % (time_frame // 7)
@@ -90,8 +43,8 @@ def get_time_description(time_frame, prev=False):
 
 
 def get_time_statistics(time_frame, offset):
-    # i.e. say we want the aggregate data over a week, 4 weeks ago, we would call gts(7,3). zero indexed, i.e. gts(7,0)
-    # is the most recent week of stats
+    # i.e. say we want the aggregate data over a week, 4 weeks ago, we would call gts(7,3). zero indexed, i.e. gts(7,
+    # 0) is the most recent week of stats
     time_threshold_0 = timezone.now() - timedelta(days=time_frame * (offset + 1))
     time_threshold_1 = timezone.now() - timedelta(days=offset * time_frame)
     test_objects = Test.objects.filter(test_date__gt=time_threshold_0).filter(test_date__lte=time_threshold_1)
@@ -111,20 +64,20 @@ def get_time_statistics(time_frame, offset):
         age_groups.append(birthday)
     # by this point, age_groups is a list of the dates today, 10 years ago... up to 80 years ago
     age_test_data = []
-    for i in range(0, 8, 1):
-        birthday0 = age_groups[i]
-        birthday1 = age_groups[i + 1]
-        age_test_data.append(test_objects.filter(person__date_of_birth__lte=birthday0).filter(
-            person__date_of_birth__gt=birthday1).count())  # i.e. their birthday is in the 10 year window from birthday0 to birthday1
-    age_test_data.append(test_objects.filter(person__date_of_birth__lte=age_groups[8]).count())
+    for i in range(0, 9, 1):
+        birthday = age_groups[i]
+        age_test_data.append(test_objects.filter(person__date_of_birth__gte=birthday).count())
 
-    age_pos_data = []
     for i in range(0, 8, 1):
-        birthday0 = age_groups[i]
-        birthday1 = age_groups[i + 1]
-        age_pos_data.append(
-            pos_tests.filter(person__date_of_birth__gt=birthday1).filter(person__date_of_birth__lte=birthday0).count())
-    age_pos_data.append(pos_tests.filter(person__date_of_birth__lte=age_groups[8]).count())
+        age_test_data[i + 1] -= age_test_data[i]
+    # age_data is now a list of size 9 with the number of people in the ages 0-9,10-19.. 80+ who have been tested
+    age_pos_data = []
+
+    for i in range(0, 9, 1):
+        birthday = age_groups[i]
+        age_pos_data.append(pos_tests.filter(person__date_of_birth__gte=birthday).count())
+    for i in range(0, 8, 1):
+        age_pos_data[i + 1] -= age_pos_data[i]
 
     # age_pos_data is now a list of size 9 with the number of positive cases for people in each age group
 
@@ -141,24 +94,20 @@ def get_time_statistics(time_frame, offset):
     contacted = ContactContacted.objects.filter(date_contacted__gt=time_threshold_0).filter(
         date_contacted__lte=time_threshold_1).count()
 
-    tests_by_day = test_objects.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(
-        count=Count("id")).values(
-        "day", "count")
-    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(
-        count=Count("id")).values(
+    tests_by_day = test_objects.annotate(day = TruncDate("test_date")).values("day").order_by("day").annotate(count=Count("id")).values("day", "count")
+    pos_by_day = pos_tests.annotate(day=TruncDate("test_date")).values("day").order_by("day").annotate(count=Count("id")).values(
         "day", "count")
     rate_by_day = []
     for (pos, tests) in zip(pos_by_day, tests_by_day):
         if pos["count"] > 0:
-            rate = pos["count"] / tests["count"]
+            rate = pos["count"]/ tests["count"]
         else:
             rate = 0
         rate_by_day.append({"day": pos["day"],
-                            "count": rate})
+                           "count": rate})
 
     return {'max': max_contacts, 'avg': avg_contacts, 'age_test_data': age_test_data, 'age_pos_data': age_pos_data,
-            'num': num_tests, 'pos': num_pos, 'rate': pos_rate, 'contacted': contacted, 'tests_by_day': tests_by_day,
-            'pos_by_day': pos_by_day, 'rate_by_day': rate_by_day}
+            'num': num_tests, 'pos': num_pos, 'rate': pos_rate, 'contacted': contacted, 'tests_by_day': tests_by_day, 'pos_by_day': pos_by_day, 'rate_by_day': rate_by_day}
 
 
 def timebased(request, time_frame):
@@ -199,10 +148,5 @@ def timebased(request, time_frame):
                                       (sn["rate_by_day"], sp["rate_by_day"], "Positivity rate", "pos_rate_canvas")],
                       # Clustering parameters
                       'min_cases_in_cluster': MIN_PTS,
-                      'cluster_radius': EPS,
-                      # clustering data
-                      "clusters": clusters(time_threshold),
-                      # geographic areas data
-                      "areas": get_geographic_data(time_threshold)
-
+                      'cluster_radius': EPS
                   })

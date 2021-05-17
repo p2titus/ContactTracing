@@ -1,4 +1,3 @@
-{% load geojson_tags %}
 <!doctype html>
 <html class="h-100" lang="en">
 <head>
@@ -17,11 +16,6 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-          crossorigin=""/>
 
     <style>
         .number-highlight {
@@ -55,7 +49,53 @@
 </head>
 <body class="d-flex flex-column h-100">
 
-{%  include "government/header.html"  with page_title="Contact Tracing Statistics Portal"%}
+<header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Contact Tracing Statistics Portal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mb-2 mb-md-0 d-flex" style="width: 100%;">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Other timeframes
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/govt/timebased/7">Week</a></li>
+                            <li><a class="dropdown-item" href="#">Others here</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Custom time??</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown ms-auto">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Login
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">to the Laboratory system</a></li>
+                            <li><a class="dropdown-item" href="#">to the Tracing system</a></li>
+
+                        </ul>
+                    </li>
+
+                </ul>
+
+
+            </div>
+        </div>
+    </nav>
+</header>
 
 {% load govt_maths %}
 <!-- Begin page content -->
@@ -122,34 +162,135 @@
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                {% for nice_name, var_name, data in areas %}
-                    <div class="tab-pane fade {% if var_name == "country" %}show active{% endif %}"
-                         id="nav-{{ var_name }}" role="tabpanel"
-                         aria-labelledby="nav-{{ var_name }}-tab">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">{{ nice_name }}</th>
-                                <th scope="col">Cases in the {{ time_description }}</th>
-                                <th scope="col">Cases per 100,000</th>
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for area in data %}
-                                <tr>
-                                    <th scope="row">{{ area.name }}</th>
-                                    <td>{{ area.alltime_count }}</td>
-                                    <td>{% if area.population == 0 %} Data unavailable {% else %} {{ area.alltime_count|per:area.population|floatformat:2 }} {% endif %} </td>
-                                </tr>
-
-                            {% endfor %}
-
-                            </tbody>
-                        </table>
-                        <div class="areas_map" id="{{ var_name }}-map" style="height: 40vh; width:100%"></div>
-                    </div>
-                {% endfor %}
+                <div class="tab-pane fade show active" id="nav-country" role="tabpanel"
+                     aria-labelledby="nav-country-tab">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Country data or whatever</th>
+                            <th scope="col">Last</th>
+                            <th scope="col">Handle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td colspan="2">Larry the Bird</td>
+                            <td>@twitter</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p>And a country map here</p>
+                </div>
+                <div class="tab-pane fade" id="nav-region" role="tabpanel" aria-labelledby="nav-region-tab">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Region data or whatever</th>
+                            <th scope="col">Last</th>
+                            <th scope="col">Handle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td colspan="2">Larry the Bird</td>
+                            <td>@twitter</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p>And a region map here</p>
+                </div>
+                <div class="tab-pane fade" id="nav-county" role="tabpanel" aria-labelledby="nav-county-tab">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">County ^ Unitary AUthority data or whatever</th>
+                            <th scope="col">Last</th>
+                            <th scope="col">Handle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td colspan="2">Larry the Bird</td>
+                            <td>@twitter</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p>And a county map here</p>
+                </div>
+                <div class="tab-pane fade" id="nav-la" role="tabpanel" aria-labelledby="nav-la-tab">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Local authority data or whatever</th>
+                            <th scope="col">Last</th>
+                            <th scope="col">Handle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>@mdo</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                            <td>@fat</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td colspan="2">Larry the Bird</td>
+                            <td>@twitter</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p>And a LA map here</p>
+                </div>
             </div>
 
             <p class="mt-3">Across different age ranges:</p>
@@ -164,7 +305,7 @@
             <p>In {{ time_description }}, </p>
             <ul class="datapoints-list">
                 <!-- TODO: make indicators real -->
-                <li><span class="number-highlight">{{ cases_contacted|floatformat:2 }}%</span> of positive
+                <li><span class="number-highlight">Unknown{# { cases_contacted|floatformat:2 }} #}%</span> of positive
                     cases were contacted by tracers
                     <span data-bs-toggle="tooltip" data-bs-placement="right"
                           title="{% if cases_contacted >= prev_cases_contacted %}Increase{% else %}Decrease{% endif %} over {{ prev_time_description }}, from {{ prev_cases_contacted|floatformat:2 }} to {{ cases_contacted|floatformat:2 }}"
@@ -197,9 +338,9 @@
 
             </ul>
             <p>These contacts occurred in several clusters across the country, where a cluster is made up of at
-                least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other. A cluster is shown on
-                the map if at least one case in it occurred in {{ time_description }}.</p>
-            <div id="clusters-map" style="height: 40vh;"></div>
+                least {{ min_cases_in_cluster }} cases within {{ cluster_radius }}m of each other.</p>
+
+            <div>Cluster map here</div>
         </div>
 
     </div>
@@ -207,7 +348,7 @@
 
 <footer class="footer mt-auto py-3 bg-light">
     <div class="container">
-        <span class="text-muted">Source for UK administrative area boundaries: Office for National Statistics licensed under the Open Government Licence v.3.0</span>
+        <span class="text-muted">TODO: Footer stuff here......</span>
     </div>
 </footer>
 
@@ -363,128 +504,5 @@
 
 </script>
 
-<!-- Cluster map JS -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-        crossorigin=""></script>
-<script>
-    const default_centre = [51, 0]
-    const default_zoom = 7
-
-    function style(feature) {
-        return {
-            fillColor: "red",
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-
-            fillOpacity: 0.7
-        };
-    }
-
-    function highlightFeature(e) {
-        let layer = e.target;
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-    }
-
-    const cluster_data = {{ clusters |geojsonfeature:"cluster_id,points_in_cluster:area"|safe }};
-
-    const map = L.map("clusters-map").setView(default_centre, default_zoom);
-
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1a1a471a-99d2-4dd3-80e0-9d1fc70cd64e', {
-        maxZoom: 20,
-        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-
-    let resetHighlight = (e) => {
-        json.resetStyle(e.target);
-    }
-
-    let zoomToFeature = (e) => {
-        map.fitBounds(e.target.getBounds());
-    }
-
-    let mapOnEachFeature = (feature, layer) => {
-        layer.on({
-            mouseover: highlightFeature,
-            mouseout: resetHighlight,
-            //click: zoomToFeature
-        });
-        if (feature.properties) {
-            layer.bindPopup(`Cases in cluster: ${feature.properties.cluster_size}`);
-        }
-    }
-    let json = L.geoJson(cluster_data, {
-        style: style,
-        onEachFeature: mapOnEachFeature
-    }).addTo(map);
-
-</script>
-<!-- Area mapping scripts -->
-<script>
-    let maps = []
-    {% for _, var_name,data in areas %}
-        {
-            const geojson_data =
-                {{ data|geojsonfeature:"name,id,type,cluster_size:poly"|safe }};
-
-
-            let map = L.map("{{ var_name }}-map").setView(default_centre, default_zoom)
-
-            L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1a1a471a-99d2-4dd3-80e0-9d1fc70cd64e', {
-                maxZoom: 20,
-                attribution: 'Contains OS data &copy; Crown copyright and database right 2020,&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-            }).addTo(map);
-
-
-            let resetHighlight = (e) => {
-                json.resetStyle(e.target);
-            }
-
-            let zoomToFeature = (e) => {
-                map.fitBounds(e.target.getBounds());
-            }
-
-            let mapOnEachFeature = (feature, layer) => {
-                layer.on({
-                    mouseover: highlightFeature,
-                    mouseout: resetHighlight,
-                    //click: zoomToFeature
-                });
-                if (feature.properties && feature.properties.alltime_count) {
-                    layer.bindPopup(`Cases in entire pandemic: ${feature.properties.alltime_count}`);
-                }
-            }
-            let json = L.geoJson(geojson_data, {
-                style: style,
-                onEachFeature: mapOnEachFeature
-            }).addTo(map);
-
-            maps["{{ var_name }}"] = map;
-        }
-
-    {% endfor %}
-
-
-    // Update the maps when changing tab so they actually load properly.
-    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]')
-    tabEls.forEach(el => el.addEventListener('shown.bs.tab', function (event) {
-            console.log(event.target)
-            maps[event.target.dataset["bsTarget"].split("-")[1]].invalidateSize();
-        })
-    )
-
-
-</script>
 </body>
 </html>

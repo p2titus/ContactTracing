@@ -1,6 +1,4 @@
 from django import forms
-
-from government.hooks.hooks import get_coords
 from shared.models import People, Addresses, Test
 from django.core.validators import validate_email
 import datetime
@@ -40,7 +38,6 @@ class SingleTestForm(forms.Form):
                                                        postcode=self.cleaned_data['postcode'])
             if possibleAddress.count() == 0:
                 location = Addresses(addr=self.cleaned_data['addr'], postcode=self.cleaned_data['postcode'])
-                location.point = get_coords(self.cleaned_data['postcode'])
                 location.save()
                 p = People(
                     name=self.cleaned_data['name'],
@@ -120,7 +117,6 @@ class MultipleTestsForm(forms.Form):
                     person = None
             else:
                 location = Addresses(addr=test_dict['address'], postcode=test_dict['postcode'])
-                location.point=get_coords(test_dict['postcode'])
                 person = None
             
             location.save()

@@ -6,11 +6,8 @@ import json
 from .forms import SingleTestForm, MultipleTestsForm
 
 # Create your views here.
-def loggedIn(request):
-    return HttpResponseRedirect("/testingCentre/choose")
-
-def logout(request):
-    return HttpResponseRedirect("/testingCentre/accounts/login")
+class LoginView(generic.TemplateView):
+    pass
 
 class ChooseInputMethodView(generic.TemplateView):
     template_name = "testingCentre/chooseInputMethod.html"
