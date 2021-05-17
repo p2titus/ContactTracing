@@ -8,6 +8,7 @@ Requirements:
 - PostgreSQL - the version doesn't really matter but 12 or higher works
 - PostGIS extension for PostgreSQL, as well as the libraries that requires
     - on Ubuntu/Debian, use the ppa repository for PostgreSQL, which includes a package for PostGIS with all its requirements
+- RabbitMQ - further details about the requirements for this can be found in the README in the tracer_queues section of the project
 
 
 Data:
