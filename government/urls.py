@@ -20,7 +20,9 @@ from . import views
 app_name = 'government'
 urlpatterns = [
     # Homepage, such as it is:
-    path('', views.index, name="index"),
-    #ex /govt/timebased/0/
+    path('', views.home, name="index"),
+    # ex /govt/timebased/0/
     path('timebased/<int:time_frame>/', views.timebased, name="timebased"),
+
+    path('clusters', views.clusters, name="clusters")
 ]

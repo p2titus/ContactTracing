@@ -3,3 +3,8 @@ Django==3.1.7
 pytz==2021.1
 sqlparse==0.4.1
 python3-pika~=0.9.14
+django-geojson==3.2.0
+psycopg2-binary==2.8.6
+leaflet==0.0.3
+requests~=2.25.1
+openpyxl~=3.0.7

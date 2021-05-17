@@ -1,8 +1,39 @@
-from django.db import models
-from django.db.models import Count, Max, Min, Avg
+from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
+
 from shared.models import People, Test, TestContacted, ContactContacted, Contact
-from datetime import date, time, datetime, timedelta
+
+
 # Create your models here.
+
+class Area(models.Model):
+    COUNTRY = "CTRY"
+    REGION = "REG"
+    COUNTY = "CNTY"
+    LA = "LA"
+    AREA_TYPES = (
+        (COUNTRY, "Country"),
+        (REGION, "Region"),
+        (COUNTY, "County/Unitary Authority"),
+        (LA, "Local Authority District")
+    )
+    name = models.CharField(max_length=256)
+    poly = models.MultiPolygonField(srid=3035)
+    population = models.IntegerField()
+    type = models.CharField(max_length=4, choices=AREA_TYPES, default=LA)
+
+
+class Cluster(models.Model):
+    cluster_id = models.UUIDField(primary_key=True)
+    # A generated polygon around the points in this cluster.
+    area = models.PolygonField()
+    cluster_size = models.IntegerField(default=0)
+    indices = ArrayField(models.IntegerField())
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+
+
 
 """class AggregateData(models.Model):
     timeframe = 0

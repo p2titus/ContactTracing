@@ -1,4 +1,6 @@
-from django.db import models
+from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
+from django.db import transaction
 import datetime
 
 
@@ -14,11 +16,14 @@ class Addresses(models.Model):
     addr = models.CharField(max_length=256)
     # max length assumed from https://ideal-postcodes.co.uk/guides/uk-postcode-format
     postcode = models.CharField(max_length=8)
+    # a map projection suitable for the UK, using metres as its units - so coordinates are actually Eastings and
+    # Northings: https://epsg.io/3035
+    point = models.PointField(default=Point(0, 0), srid=3035)
 
 
 class People(models.Model):
     name = models.CharField(max_length=256)
-    date_of_birth = models.DateField(default=datetime.date(1970, 1, 1))  # default to unix epoch
+    date_of_birth = models.DateField()
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     # allows for country code (e.g. +44)
     phone_num = models.CharField(max_length=13)
@@ -55,6 +60,7 @@ class Contact(models.Model):
     case_contact = models.ForeignKey(People, on_delete=models.CASCADE)
     # this separate location is necessary for statistics - used to show where contact happened
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE, related_name="loc")
+    cluster = models.CharField(null=True, max_length=36, default=None)
     being_contacted = models.BooleanField(default=False)
     contact_start = models.DateTimeField(auto_now_add=True)
 

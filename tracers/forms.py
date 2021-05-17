@@ -1,4 +1,7 @@
 from django import forms
+
+from government.hooks.dbscan import cluster
+from government.hooks.hooks import get_coords
 from shared.models import *
 
 class Form(forms.Form):
@@ -27,14 +30,15 @@ class ContactForm(forms.Form):
                                                        postcode=self.cleaned_data['postcode'])
             if possibleAddress.count() == 0:
                 location = Addresses(addr=self.cleaned_data['place_of_contact'], postcode=self.cleaned_data['postcode'])
+                location.point = get_coords(self.cleaned_data['postcode'])
                 location.save()
                 # bit weird because persons address gets saved as the place of contact, which is not necessarily accurate, also their date of birth will be the default
-                # TODO: Check this doesn't effect the stats
                 p = People(
                     name=self.cleaned_data['contact_name'],
                     phone_num=self.cleaned_data['contact_phone_num'],
                     email=self.cleaned_data['contact_email'],
-                    location=Addresses.objects.get(pk=location.pk)
+                    location=Addresses.objects.get(pk=location.pk),
+                    date_of_birth=datetime.date(1971, 1, 1)
                 )
             else:
                 p = People(
@@ -55,6 +59,7 @@ class ContactForm(forms.Form):
         assert (address.count() <= 1)
         if address.count() == 0:
             location = Addresses(addr=self.cleaned_data['place_of_contact'], postcode=self.cleaned_data['postcode'])
+            location.point=get_coords(self.cleaned_data['postcode'])
             location.save()
             return location.pk
         else:
@@ -69,6 +74,7 @@ class ContactForm(forms.Form):
             location = Addresses.objects.get(pk=location)
         )
         t.save()
+        cluster(t)
 
 
     def add_contact(self):
