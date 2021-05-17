@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 generate_case(la.interiorpoint.x, la.interiorpoint.y, i)
                 i += 1
 
-        elif options["generate_random_cases"]:
+        if options["generate_random_cases"]:
             print("Generating random cases")
             addr = []
             people = []
@@ -101,7 +101,7 @@ class Command(BaseCommand):
                 t.test_date = random_date(timezone.now() - timedelta(days=i + 1), timezone.now())
                 t.save()
 
-        elif options["generate_random_contacts"]:
+        if options["generate_random_contacts"]:
             print("Generating random contacts")
             positive_cases = Test.objects.all()[:4000]
             addr = []

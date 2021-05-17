@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 lm = CustomLayerMapping(model=Area, data=ds, mapping=mapping, custom={"type":  types[t]})
                 lm.save(verbose=False, strict=True)
 
-        elif options["pops"]:
+        if options["pops"]:
             wb = load_workbook(filename=POPULATION_XLSX_FILE)
             sheet = wb["MYE2 - Persons"]
             data = sheet["B6": "D431"]
@@ -64,5 +64,3 @@ class Command(BaseCommand):
                 else:
                     print("Not found", name, pop, poss)
 
-        else:
-            print("Please provide a valid argument.")
