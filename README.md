@@ -16,6 +16,11 @@ Data:
     - use the BUC borders - i.e. generalised to 500m and clipped to the coast, as anything more detailed makes the maps unnecessarily slow, for little gain.
     - you should download the shapefile option, and place all the files in the appropriate folder.
 
+Geocoding:
+- at the moment, the code only uses basic geocoding using the postcode.io API - so necessarily it only geocodes to within a postcode.
+This is because geocoding is expensive and can be sourced from lots of different APIs. You should change the `get_coords`
+  function in `government/hooks/hooks.py` if you want to use a different API.
+
 Database setup:
 - create a database and a user, and ensure these are in the `settings.py` file.
 - run `create extension postgis` in the PostgreSQL prompt, to enable the geography extensions

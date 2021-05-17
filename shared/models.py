@@ -23,7 +23,7 @@ class Addresses(models.Model):
 
 class People(models.Model):
     name = models.CharField(max_length=256)
-    date_of_birth = models.DateField(default=datetime.date(1970, 1, 1))  # default to unix epoch
+    date_of_birth = models.DateField()
     location = models.ForeignKey(Addresses, on_delete=models.CASCADE)
     # allows for country code (e.g. +44)
     phone_num = models.CharField(max_length=13)
