@@ -1,0 +1,39 @@
+[
+    { "name": "James Zhang",
+      "date of birth": "30/01/01",
+      "phone": "12345678",
+      "email": "yinjie@qq.com",
+      "address": "Hefei",
+      "postcode": "214000",
+      "test date": "18/03/20",
+      "test result": false
+    },
+    {
+        "name": "Serge Gnabry",
+        "date of birth": "14/07/95",
+        "phone": "4912345654321",
+        "email": "serge.gnabry@fcbayern.com",
+        "address": "Allianz Arena",
+        "postcode": "80000",
+        "test date": "06/04/21",
+        "test result": true
+    },
+    { "name": "James Zhang",
+      "date of birth": "30/01/01",
+      "phone": "12345678",
+      "email": "yinjie@qq.com",
+      "address": "Hefei",
+      "postcode": "214000",
+      "test date": "21/04/20",
+      "test result": false
+    },
+    { "name": "Thomas Muller",
+      "date of birth": "13/09/89",
+      "phone": "4925252525250",
+      "email": "thomas.muller@fcbayern.com",
+      "address": "Allianz Arena",
+      "postcode": "80000",
+      "test date": "11/02/21",
+      "test result": true
+    }
+]
