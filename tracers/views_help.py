@@ -20,16 +20,31 @@ def tests_needing_contacting():
         .filter(result__exact=True)
 
 
+# given a dict with the data communicated via rabbitmq, retrieves the corresponding test from the database
+def __get_test(td: dict):  # td = test_data
+    return Test.objects.filter(person__name=td['name'], person__date_of_birth=td['date_of_birth'],
+                               person__phone_num=td['phone_num']).first()
+    # the likelihood of two people having the same name, date of birth and phone number is minimal
+    # however, if you want a unique entry, you should send more fields via rabbitmq
+
 # claims & returns
+# as rabbitmq takes care of race conditions on the database, we are free to read without regard for other processes
+# we need to read for the forms this returns to
 def next_test():
-    try:
-        with transaction.atomic():
-            now = datetime.datetime.now(timezone.utc)
-            test = tests_needing_contacting().earliest('test_date')
-            test.being_contacted = True
-            test.contact_start = now
-            test.save()
-    except Test.DoesNotExist:
+    import tracer_queues
+    next_details = tracer_queues.retrieve_pos_case()
+    if next_details is not None:
+        try:
+            with transaction.atomic():
+                now = datetime.datetime.now(timezone.utc)
+                test = __get_test(next_details)
+                # test = tests_needing_contacting().earliest('test_date')  # originally queried all from one single db
+                test.being_contacted = True
+                test.contact_start = now
+                test.save()
+        except Test.DoesNotExist:
+            test = None
+    else:
         test = None
     return test
 
@@ -44,17 +59,28 @@ def contacts_needing_contacting():
         .exclude(case_contact__in=ContactContacted.objects.values_list('contact', flat=True))
 
 
+def __get_contact(cd: dict):  # cd = contact data
+    return Contact.objects.filter(person__name=cd['name'], person__date_of_birth=cd['date_of_birth'],
+                                  person__phone_num=cd['phone_num']).first()
+
 # claims & returns
+# TODO - check rabbitmq used correctly
 def next_contact():
-    try:
-        with transaction.atomic():
-            now = datetime.datetime.now(timezone.utc)
-            contact = contacts_needing_contacting().first()
-            if contact is not None:
-                contact.being_contacted = True
-                contact.contact_start = now
-                contact.save()
-    except Contact.DoesNotExist:
+    import tracer_queues
+    next_details = tracer_queues.retrieve_contact()
+    if next_details is not None:
+        try:
+            with transaction.atomic():
+                now = datetime.datetime.now(timezone.utc)
+                contact = __get_contact(next_details)
+                # contact = contacts_needing_contacting().first()
+                if contact is not None:
+                    contact.being_contacted = True
+                    contact.contact_start = now
+                    contact.save()
+        except Contact.DoesNotExist:
+            contact = None
+    else:
         contact = None
     return contact
 
