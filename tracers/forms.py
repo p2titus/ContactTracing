@@ -30,7 +30,7 @@ class ContactForm(forms.Form):
                                                        postcode=self.cleaned_data['postcode'])
             if possibleAddress.count() == 0:
                 location = Addresses(addr=self.cleaned_data['place_of_contact'], postcode=self.cleaned_data['postcode'])
-                location.point = get_coords(self.cleaned_data['postcode'])
+                location.point = get_coords(self.cleaned_data['place_of_contact'], self.cleaned_data['postcode'])
                 location.save()
                 # bit weird because persons address gets saved as the place of contact, which is not necessarily accurate, also their date of birth will be the default
                 p = People(
@@ -59,7 +59,7 @@ class ContactForm(forms.Form):
         assert (address.count() <= 1)
         if address.count() == 0:
             location = Addresses(addr=self.cleaned_data['place_of_contact'], postcode=self.cleaned_data['postcode'])
-            location.point=get_coords(self.cleaned_data['postcode'])
+            location.point=get_coords(self.cleaned_data['place_of_contact'], self.cleaned_data['postcode'])
             location.save()
             return location.pk
         else:

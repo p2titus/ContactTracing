@@ -5,16 +5,16 @@ from .dbscan import cluster
 
 
 def contact_hook(contact):
-    point = get_coords(contact.location)
+    point = get_coords(contact.location.addr, contact.location.postcode)
     if point is not None:
         contact.location.point = point
         contact.location.save()
     cluster(contact)
 
 
-def get_coords(location):
-    """Change this function to use your choice of geocoding API. `location` has an `addr` field and a `postcode` field. """
-    url = 'https://api.postcodes.io/postcodes/{postcode}'.format(postcode=location.postcode)
+def get_coords(addr, postcode):
+    """Change this function to use your choice of geocoding API. `addr` is a freeform text input for the address """
+    url = 'https://api.postcodes.io/postcodes/{postcode}'.format(postcode=postcode)
     response = requests.get(url)
     if response.status_code == 200:
         json = response.json()["result"]
