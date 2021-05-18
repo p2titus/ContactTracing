@@ -5,6 +5,11 @@ from . import views_help
 from .forms import *
 import tracer_queues
 
+"""
+TODO - it needs to be decided exactly what needs to be pushed to the queue
+Currently, __extract_case_data tries to extract data that doesnt exist in the cleaned data
+"""
+
 
 # avoiding duplicate names of functions
 def add_contact_to_queue(contact: dict):
