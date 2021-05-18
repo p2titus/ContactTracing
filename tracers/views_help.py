@@ -79,10 +79,23 @@ def next_contact():
                     contact.contact_start = now
                     contact.save()
         except Contact.DoesNotExist:
-            contact = None
+            contact = __Contact(next_details['name'],
+                                next_details['date_of_birth'],
+                                next_details['phone_num'])
     else:
         contact = None
     return contact
+
+
+class __Contact:
+    name = None
+    date_of_birth = None
+    phone_num = None
+
+    def __init__(self, name, dob, phone_num):
+        self.name = name
+        self.date_of_birth = dob
+        self.phone_num = phone_num
 
 
 # updates timestamp on (un-expired) claim so it doesn't expire

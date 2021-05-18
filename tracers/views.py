@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views import generic
 from . import views_help
 from .forms import *
-from tracer_queues import add_poscase
+import tracer_queues
 
 
 # avoiding duplicate names of functions
@@ -76,6 +76,7 @@ def __extract_case_data(form):
 
 
 def __extract_contact_data(form):
+    print(form.cleaned_data)
     return {
         'name': form.cleaned_data['contact_name'],
         'phone_num': form.cleaned_data['contact_phone_num'],
@@ -95,9 +96,18 @@ def add_testcontacted(request):
         form = TestContactedForm(request.POST)
         if form.is_valid():
             form.confirm_call()
-            if form.cleaned_data[__success_field_name] is False:
+            succ = form.cleaned_data[__success_field_name]
+            print("confirm call in testcontacted")
+            print(f"success was {succ}")
+            print(type(succ))
+            if succ == "False":
+                print("hit testcontacted non success branch")
                 case = __extract_case_data(form)
-                add_poscase(case)
+                print('case')
+                print(case)
+                tracer_queues.add_poscase(case)
+            """if succ:
+                print("successful branch???")"""
             return HttpResponseRedirect('/tracers')
         else:
             return HttpResponseRedirect('/tracers/error')
@@ -111,7 +121,7 @@ def add_contactcontacted(request):
             form.confirm_call()
             if form.cleaned_data[__success_field_name] is False:  # TODO - ensure correct
                 case = __extract_case_data(form)
-                add_contact(case)
+                tracer_queues.add_contact(case)
             return HttpResponseRedirect('/tracers')
         else:
             return HttpResponseRedirect('/tracers/error')

@@ -66,6 +66,8 @@ def __setup(qname):
 def __add_to_queue(qname, case):
     chan, con = __setup(qname)
     dte = DateTimeEncoder()
+    print('date time encoded')
+    print(dte.encode(case))
     chan.basic_publish(exchange='', routing_key=qname, body=dte.encode(case),
                        properties=pika.BasicProperties(
                            delivery_mode=PERSISTENT,
